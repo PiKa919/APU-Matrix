@@ -9,15 +9,19 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "chart.js": "^4.5.1",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "cheerio": "^1.2.0",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.34.4",
     "lucide-react": "^0.576.0",
     "mongoose": "^9.2.3",
     "next": "16.1.6",
     "react": "19.2.3",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "19.2.3",
-    "recharts": "^3.7.0",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
