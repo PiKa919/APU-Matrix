@@ -50,6 +50,10 @@ const DeviceSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    releaseDate: {
+        type: String,
+        required: false,
+    },
     lastUpdated: {
         type: Date,
         default: Date.now,

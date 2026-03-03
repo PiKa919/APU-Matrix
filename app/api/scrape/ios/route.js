@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import connectToDatabase from '@/lib/mongodb';
 import Device from '@/models/Device';
 import { scrapeAntutu } from '@/lib/scrapeAntutu';
@@ -36,10 +37,11 @@ export async function GET() {
                         ram: dev.ram,
                         storage: dev.storage,
                         category: CATEGORY,
+                        price: dev.price,
+                        releaseDate: dev.releaseDate,
                         lastUpdated: new Date(),
                     },
                     $setOnInsert: {
-                        price: dev.price,
                     },
                 },
                 { upsert: true, new: true }
