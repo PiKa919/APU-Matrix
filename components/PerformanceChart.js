@@ -223,10 +223,11 @@ export default function PerformanceChart({ data }) {
                             },
                             label: (item) => {
                                 const d = item.raw;
+                                const priceFormat = d.price ? `₹${d.price.toLocaleString()}` : 'N/A';
                                 return [
                                     `Score: ${d.y.toLocaleString()}`,
                                     `Brand: ${d.brand}`,
-                                    `Price: $${d.price}`,
+                                    `Price: ${priceFormat}`,
                                 ];
                             },
                         },
