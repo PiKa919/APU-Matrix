@@ -1,16 +1,19 @@
 'use client';
 
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import {
     Chart as ChartJS,
     ScatterController,
+    LineController,
+    LineElement,
     PointElement,
     LinearScale,
     Tooltip,
     Legend,
 } from 'chart.js';
+import { EyeOff, Eye } from 'lucide-react';
 
-ChartJS.register(ScatterController, PointElement, LinearScale, Tooltip, Legend);
+ChartJS.register(ScatterController, LineController, LineElement, PointElement, LinearScale, Tooltip, Legend);
 
 const BRAND_COLORS = {
     'Apple': '#34d399',
@@ -42,16 +45,57 @@ function getBrandColor(brand) {
     return BRAND_COLORS[brand] || DEFAULT_COLOR;
 }
 
+// Simple linear regression to draw trend lines
+function linearRegression(points) {
+    if (points.length < 2) return null;
+    const n = points.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    for (const p of points) {
+        sumX += p.x;
+        sumY += p.y;
+        sumXY += p.x * p.y;
+        sumX2 += p.x * p.x;
+    }
+    const denom = n * sumX2 - sumX * sumX;
+    if (Math.abs(denom) < 1e-10) return null;
+    const slope = (n * sumXY - sumX * sumY) / denom;
+    const intercept = (sumY - slope * sumX) / n;
+    // Create two points for the fitted line from min x to max x
+    const xs = points.map(p => p.x);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    return [
+        { x: minX, y: slope * minX + intercept },
+        { x: maxX, y: slope * maxX + intercept },
+    ];
+}
+
 export default function PerformanceChart({ data }) {
     const canvasRef = useRef(null);
     const chartRef = useRef(null);
+    const [hideMissingPrices, setHideMissingPrices] = useState(false);
+
+    // Threshold: any price under ₹2000 is clearly a placeholder (₹100 etc), not a real phone price
+    const PRICE_THRESHOLD = 2000;
+
+    // Filter data based on the 'hide missing prices' toggle
+    const visibleData = useMemo(() => {
+        if (!data) return [];
+        if (hideMissingPrices) return data.filter(d => typeof d.price === 'number' && d.price >= PRICE_THRESHOLD);
+        return data;
+    }, [data, hideMissingPrices]);
+
+    const missingCount = useMemo(() => {
+        if (!data) return 0;
+        return data.filter(d => !d.price || typeof d.price !== 'number' || d.price < PRICE_THRESHOLD).length;
+    }, [data]);
 
     const chartData = useMemo(() => {
-        if (!data || data.length === 0) return null;
+        if (!visibleData || visibleData.length === 0) return null;
 
-        // Group by brand, only include devices with a price
+        // Group by brand
         const grouped = {};
-        data.forEach(d => {
+        visibleData.forEach(d => {
             const brand = d.brand || 'Unknown';
             if (!grouped[brand]) grouped[brand] = [];
             grouped[brand].push({
@@ -64,24 +108,51 @@ export default function PerformanceChart({ data }) {
             });
         });
 
-        const datasets = Object.entries(grouped).map(([brand, points]) => {
+        const datasets = [];
+
+        Object.entries(grouped).forEach(([brand, points]) => {
             const color = getBrandColor(brand);
-            return {
+
+            // Scatter points dataset
+            datasets.push({
+                type: 'scatter',
                 label: brand,
                 data: points,
-                backgroundColor: color + 'cc',
+                backgroundColor: color + 'bb',
                 borderColor: color,
-                pointRadius: 5,
-                pointHoverRadius: 9,
+                pointRadius: 3,
+                pointHoverRadius: 7,
                 pointHoverBackgroundColor: '#ffffff',
                 pointHoverBorderColor: color,
                 pointHoverBorderWidth: 2,
-                pointBorderWidth: 0,
-            };
+                pointBorderWidth: 0.5,
+                order: 2, // Render points on top of lines
+            });
+
+            // Trend line dataset (only for brands with 3+ priced devices)
+            const pricedPoints = points.filter(p => p.x > 0);
+            if (pricedPoints.length >= 3) {
+                const trendLine = linearRegression(pricedPoints);
+                if (trendLine) {
+                    datasets.push({
+                        type: 'line',
+                        label: `${brand} trend`,
+                        data: trendLine,
+                        borderColor: color + '50',
+                        borderWidth: 1.5,
+                        borderDash: [6, 4],
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        fill: false,
+                        tension: 0,
+                        order: 3, // Render lines behind points
+                    });
+                }
+            }
         });
 
         return { datasets };
-    }, [data]);
+    }, [visibleData]);
 
     useEffect(() => {
         if (!canvasRef.current || !chartData) return;
@@ -98,7 +169,7 @@ export default function PerformanceChart({ data }) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 800, easing: 'easeOutQuart' },
+                animation: { duration: 600, easing: 'easeOutQuart' },
                 layout: {
                     padding: { top: 15, right: 15, bottom: 10, left: 10 },
                 },
@@ -149,7 +220,20 @@ export default function PerformanceChart({ data }) {
                 },
                 plugins: {
                     legend: {
-                        display: false,
+                        display: true,
+                        position: 'top',
+                        align: 'start',
+                        labels: {
+                            color: '#BDE8F5',
+                            font: { size: 10, family: "'Inter', sans-serif", weight: '500' },
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 10,
+                            boxWidth: 6,
+                            boxHeight: 6,
+                            // Hide trend line entries from legend
+                            filter: (item) => !item.text.includes('trend'),
+                        },
                     },
                     tooltip: {
                         backgroundColor: 'rgba(8, 20, 50, 0.95)',
@@ -163,6 +247,8 @@ export default function PerformanceChart({ data }) {
                         bodyFont: { size: 11, family: "'JetBrains Mono', monospace" },
                         displayColors: true,
                         boxPadding: 4,
+                        // Don't show tooltip for trend lines
+                        filter: (item) => !item.dataset.label?.includes('trend'),
                         callbacks: {
                             title: (items) => {
                                 if (items.length > 0) return items[0].raw.modelName;
@@ -206,8 +292,33 @@ export default function PerformanceChart({ data }) {
     }
 
     return (
-        <div className="w-full" style={{ height: '450px' }}>
-            <canvas ref={canvasRef} />
+        <div className="w-full">
+            {/* Toggle Button */}
+            <div className="flex items-center justify-end mb-3">
+                <button
+                    onClick={() => setHideMissingPrices(!hideMissingPrices)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-semibold tracking-wide transition-all duration-300 border ${hideMissingPrices
+                        ? 'bg-[#facc15]/15 text-[#facc15] border-[#facc15]/30 shadow-[0_0_8px_rgba(250,204,21,0.15)]'
+                        : 'bg-[#0F2854]/40 text-[#BDE8F5]/50 border-[#4988C4]/20 hover:text-[#BDE8F5]/80 hover:border-[#4988C4]/40'
+                        }`}
+                >
+                    {hideMissingPrices ? (
+                        <>
+                            <EyeOff size={12} />
+                            <span>Hiding {missingCount} unpriced devices</span>
+                        </>
+                    ) : (
+                        <>
+                            <Eye size={12} />
+                            <span>Hide {missingCount} unpriced devices</span>
+                        </>
+                    )}
+                </button>
+            </div>
+
+            <div style={{ height: '450px' }}>
+                <canvas ref={canvasRef} />
+            </div>
         </div>
     );
 }
