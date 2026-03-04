@@ -1,17 +1,18 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import PerformanceChart from '@/components/PerformanceChart';
-import Filters from '@/components/Filters';
-import { motion } from 'framer-motion';
-import { RefreshCw, Cpu } from 'lucide-react';
+import ProcessorChart from '@/components/ProcessorChart';
+import Sidebar from '@/components/Filters';
+import { RefreshCw, Cpu, BarChart3, Zap, Smartphone, Activity } from 'lucide-react';
 
 export default function Home() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBrand, setSelectedBrand] = useState('All');
   const [isScraping, setIsScraping] = useState(false);
   const [lastScraped, setLastScraped] = useState(null);
+  const [selectedBrands, setSelectedBrands] = useState(new Set());
+  const [selectedChipsets, setSelectedChipsets] = useState(new Set());
 
   const fetchData = async () => {
     setLoading(true);
@@ -20,6 +21,21 @@ export default function Home() {
       const json = await res.json();
       if (json.success) {
         setData(json.data);
+        // Initialize all brands and chipsets as selected
+        const allBrands = new Set(json.data.map(d => d.brand).filter(Boolean));
+        const chipsetSet = new Set();
+        json.data.forEach(d => {
+          if (d.chipset) {
+            // Normalize chipset names to short form
+            let chip = d.chipset;
+            chip = chip.replace(/Qualcomm\s+SM\d+-?\w*\s+/i, '');
+            chip = chip.replace(/MediaTek\s+MT\d+\/?\w*\s*/i, '');
+            chip = chip.replace(/\s*\(\d+ nm\)/i, '');
+            chipsetSet.add(chip);
+          }
+        });
+        setSelectedBrands(allBrands);
+        setSelectedChipsets(chipsetSet);
       }
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -28,9 +44,7 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const handleScrape = async () => {
     setIsScraping(true);
@@ -39,7 +53,7 @@ export default function Home() {
       const json = await res.json();
       if (json.success) {
         setLastScraped(new Date().toLocaleString());
-        fetchData(); // Refresh data with newly scraped items
+        fetchData();
       }
     } catch (error) {
       console.error('Scrape failed', error);
@@ -48,76 +62,220 @@ export default function Home() {
     }
   };
 
+  // Derived lists
   const brands = useMemo(() => {
-    const uniqueBrands = new Set(data.map(d => d.brand).filter(Boolean));
-    return Array.from(uniqueBrands).sort();
+    return Array.from(new Set(data.map(d => d.brand).filter(Boolean))).sort();
   }, [data]);
 
+  const chipsets = useMemo(() => {
+    const chipMap = new Set();
+    data.forEach(d => {
+      if (d.chipset) {
+        let chip = d.chipset;
+        chip = chip.replace(/Qualcomm\s+SM\d+-?\w*\s+/i, '');
+        chip = chip.replace(/MediaTek\s+MT\d+\/?\w*\s*/i, '');
+        chip = chip.replace(/\s*\(\d+ nm\)/i, '');
+        chipMap.add(chip);
+      }
+    });
+    return Array.from(chipMap).sort();
+  }, [data]);
+
+  // Filter data based on selections
   const filteredData = useMemo(() => {
-    if (selectedBrand === 'All') return data;
-    return data.filter(d => d.brand === selectedBrand);
-  }, [data, selectedBrand]);
+    return data.filter(d => {
+      if (!selectedBrands.has(d.brand)) return false;
+      return true;
+    });
+  }, [data, selectedBrands]);
+
+  // Toggle handlers
+  const onToggleBrand = useCallback((brand) => {
+    setSelectedBrands(prev => {
+      const next = new Set(prev);
+      if (next.has(brand)) next.delete(brand);
+      else next.add(brand);
+      return next;
+    });
+  }, []);
+
+  const onToggleChipset = useCallback((chip) => {
+    setSelectedChipsets(prev => {
+      const next = new Set(prev);
+      if (next.has(chip)) next.delete(chip);
+      else next.add(chip);
+      return next;
+    });
+  }, []);
+
+  const onSelectAllBrands = useCallback(() => {
+    if (selectedBrands.size === brands.length) setSelectedBrands(new Set());
+    else setSelectedBrands(new Set(brands));
+  }, [brands, selectedBrands]);
+
+  const onSelectAllChipsets = useCallback(() => {
+    if (selectedChipsets.size === chipsets.length) setSelectedChipsets(new Set());
+    else setSelectedChipsets(new Set(chipsets));
+  }, [chipsets, selectedChipsets]);
+
+  // Stats
+  const stats = useMemo(() => {
+    const withPrice = filteredData.filter(d => d.price);
+    return {
+      totalDevices: filteredData.length,
+      avgScore: filteredData.length > 0 ? Math.round(filteredData.reduce((a, d) => a + (d.score || 0), 0) / filteredData.length) : 0,
+      avgPrice: withPrice.length > 0 ? Math.round(withPrice.reduce((a, d) => a + d.price, 0) / withPrice.length) : 0,
+      topScore: filteredData.length > 0 ? Math.max(...filteredData.map(d => d.score || 0)) : 0,
+    };
+  }, [filteredData]);
 
   return (
-    <main className="min-h-screen p-6 md:p-12 lg:px-20 max-w-7xl mx-auto flex flex-col pt-16">
-      <motion.div
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6"
-      >
-        <div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#BDE8F5] via-[#4988C4] to-[#1C4D8D] flex items-center gap-4 drop-shadow-[0_0_15px_rgba(73,136,196,0.5)] tracking-tight">
-            <Cpu className="text-[#BDE8F5] drop-shadow-[0_0_10px_rgba(189,232,245,0.8)]" size={48} />
-            APU MATRIX
-          </h1>
-          <p className="text-[#4988C4] mt-3 text-lg md:text-xl max-w-2xl font-light tracking-wide">
-            Real-time AnTuTu benchmark tracking versus market price analysis.
-          </p>
-        </div>
-
-        <button
-          onClick={handleScrape}
-          disabled={isScraping}
-          className="group flex items-center gap-3 px-8 py-4 bg-gradient-to-br from-[#1C4D8D] to-[#0F2854] hover:from-[#4988C4] hover:to-[#1C4D8D] text-white rounded-2xl font-bold transition-all duration-300 shadow-[0_4px_20px_rgba(28,77,141,0.5)] hover:shadow-[0_4px_30px_rgba(73,136,196,0.7)] disabled:opacity-50 border border-[#4988C4]/30 uppercase tracking-widest text-sm"
-        >
-          <RefreshCw className={`${isScraping ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} size={20} />
-          {isScraping ? 'SYNCING AI...' : 'FORCE SYNC'}
-        </button>
-      </motion.div>
-
-      {loading ? (
-        <div className="h-[600px] w-full flex flex-col items-center justify-center glass-panel gap-6">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-[#1C4D8D]"></div>
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#4988C4] absolute top-4 left-4" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#BDE8F5] absolute top-8 left-8" style={{ animationDuration: '0.8s' }}></div>
+    <div className="min-h-screen flex flex-col">
+      {/* ─── Header Bar ─── */}
+      <header className="header-bar sticky top-0 z-50 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#facc15] to-[#f97316] flex items-center justify-center shadow-[0_0_15px_rgba(250,204,21,0.3)]">
+            <Cpu className="text-[#030815]" size={20} strokeWidth={2.5} />
           </div>
-          <p className="text-[#4988C4] tracking-widest animate-pulse font-mono text-sm">INITIALIZING DATA CORE...</p>
-        </div>
-      ) : (
-        <div className="flex flex-col h-full w-full">
-          <Filters
-            brands={brands}
-            selectedBrand={selectedBrand}
-            onSelectBrand={setSelectedBrand}
-          />
-          <PerformanceChart data={filteredData} />
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="mt-8 flex justify-between text-xs md:text-sm text-[#4988C4]/60 px-4 font-mono uppercase tracking-wider"
-          >
-            <p className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              DATA CONNECTED: ANTUTU ENGINE V3.0
+          <div>
+            <h1 className="text-lg font-extrabold tracking-tight text-[#facc15] leading-none">
+              APU MATRIX
+            </h1>
+            <p className="text-[10px] text-[#BDE8F5]/40 font-medium tracking-widest uppercase">
+              Benchmark Analytics Engine
             </p>
-            {lastScraped && <p>LATEST SYNC: {lastScraped}</p>}
-          </motion.div>
+          </div>
         </div>
-      )}
-    </main>
+
+        <div className="flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] text-[#BDE8F5]/35 font-mono tracking-wider uppercase">
+              Live — {data.length} devices
+            </span>
+          </div>
+
+          <button
+            onClick={handleScrape}
+            disabled={isScraping}
+            className="flex items-center gap-2 px-4 py-2 bg-[#facc15]/10 hover:bg-[#facc15]/20 text-[#facc15] rounded-lg text-xs font-bold tracking-wider uppercase transition-all duration-300 border border-[#facc15]/20 hover:border-[#facc15]/40 disabled:opacity-40"
+          >
+            <RefreshCw className={`${isScraping ? 'animate-spin' : ''}`} size={14} />
+            {isScraping ? 'Syncing…' : 'Sync'}
+          </button>
+        </div>
+      </header>
+
+      {/* ─── Main Layout ─── */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* ─── Sidebar ─── */}
+        {!loading && (
+          <Sidebar
+            brands={brands}
+            chipsets={chipsets}
+            selectedBrands={selectedBrands}
+            selectedChipsets={selectedChipsets}
+            onToggleBrand={onToggleBrand}
+            onToggleChipset={onToggleChipset}
+            onSelectAllBrands={onSelectAllBrands}
+            onSelectAllChipsets={onSelectAllChipsets}
+          />
+        )}
+
+        {/* ─── Content ─── */}
+        <main className="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
+          {loading ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-5">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#facc15]/50" />
+                <Cpu className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#facc15]/60" size={20} />
+              </div>
+              <p className="text-[#facc15]/40 text-xs tracking-[0.2em] uppercase font-mono">
+                Loading benchmark data…
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* ─── Stat Cards ─── */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="stat-card">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Smartphone size={13} className="text-[#4988C4]/50" />
+                    <span className="stat-label">Devices</span>
+                  </div>
+                  <div className="stat-value">{stats.totalDevices}</div>
+                </div>
+                <div className="stat-card">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Zap size={13} className="text-[#4988C4]/50" />
+                    <span className="stat-label">Avg Score</span>
+                  </div>
+                  <div className="stat-value">{stats.avgScore.toLocaleString()}</div>
+                </div>
+                <div className="stat-card">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Activity size={13} className="text-[#4988C4]/50" />
+                    <span className="stat-label">Top Score</span>
+                  </div>
+                  <div className="stat-value">{stats.topScore.toLocaleString()}</div>
+                </div>
+                <div className="stat-card">
+                  <div className="flex items-center gap-2 mb-1">
+                    <BarChart3 size={13} className="text-[#4988C4]/50" />
+                    <span className="stat-label">Avg Price</span>
+                  </div>
+                  <div className="stat-value">
+                    {stats.avgPrice > 0 ? `₹${stats.avgPrice.toLocaleString()}` : 'N/A'}
+                  </div>
+                </div>
+              </div>
+
+              {/* ─── Chart 1: Phone Brand Performance ─── */}
+              <div className="chart-section">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 className="chart-title flex items-center gap-2">
+                      <Smartphone size={16} />
+                      Phone Brand Performance
+                    </h2>
+                    <p className="chart-description mt-1">
+                      Scatter plot comparing AnTuTu benchmark scores against market price (₹) for each device.
+                      Higher is better for score; further right means more expensive. Identify the best value-for-money phones.
+                    </p>
+                  </div>
+                </div>
+                <PerformanceChart data={filteredData} />
+              </div>
+
+              {/* ─── Chart 2: Processor Rankings ─── */}
+              <div className="chart-section">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 className="chart-title flex items-center gap-2">
+                      <Cpu size={16} />
+                      Processor Benchmark Rankings
+                    </h2>
+                    <p className="chart-description mt-1">
+                      Average AnTuTu scores per chipset family across all tested devices.
+                      Different phones with the same processor can score differently due to thermal design, RAM, and software optimization.
+                    </p>
+                  </div>
+                </div>
+                <ProcessorChart data={filteredData} />
+              </div>
+
+              {/* ─── Footer ─── */}
+              <div className="flex items-center justify-between text-[10px] text-[#4988C4]/30 font-mono tracking-wider uppercase px-2 pb-4">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 animate-pulse" />
+                  AnTuTu Engine v3 · GSMArena ₹ Prices
+                </span>
+                {lastScraped && <span>Last sync: {lastScraped}</span>}
+              </div>
+            </>
+          )}
+        </main>
+      </div>
+    </div>
   );
 }
