@@ -149,18 +149,7 @@ export default function PerformanceChart({ data }) {
                 },
                 plugins: {
                     legend: {
-                        display: true,
-                        position: 'top',
-                        align: 'start',
-                        labels: {
-                            color: '#BDE8F5',
-                            font: { size: 11, family: "'Inter', sans-serif", weight: '500' },
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            padding: 12,
-                            boxWidth: 7,
-                            boxHeight: 7,
-                        },
+                        display: false,
                     },
                     tooltip: {
                         backgroundColor: 'rgba(8, 20, 50, 0.95)',

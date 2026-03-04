@@ -17,18 +17,28 @@ ChartJS.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip,
 const CHIP_COLORS = {
     'Snapdragon': '#f97316',
     'Dimensity': '#22d3ee',
-    'Exynos': '#60a5fa',
+    'Exynos': '#3b82f6',
     'Apple': '#34d399',
     'Kirin': '#ef4444',
     'Tensor': '#f472b6',
-    'Unisoc': '#a78bfa',
+    'Helio': '#a78bfa',
+    'M1': '#34d399',
+    'M2': '#2dd4bf',
+    'M3': '#06b6d4',
+    'M4': '#0ea5e9',
 };
 
 function getChipColor(chipName) {
     for (const [key, color] of Object.entries(CHIP_COLORS)) {
-        if (chipName.toLowerCase().includes(key.toLowerCase())) return color;
+        if (chipName.includes(key)) return color;
     }
     return '#94a3b8';
+}
+
+// Create a gradient color based on index for the bars
+function getBarGradientColor(index, total) {
+    const hue = 45 + (index / total) * 200; // yellow → cyan → blue
+    return `hsl(${hue}, 75%, 60%)`;
 }
 
 export default function ProcessorChart({ data }) {
@@ -41,15 +51,15 @@ export default function ProcessorChart({ data }) {
         // Group by chipset, compute average score
         const chipGroups = {};
         data.forEach(d => {
-            const chip = d.chipset || 'Unknown';
-            if (chip === 'Unknown' || chip === '') return;
+            const chip = d.chipset || '';
+            if (!chip) return;
             if (!chipGroups[chip]) chipGroups[chip] = { total: 0, count: 0, prices: [] };
             chipGroups[chip].total += d.score || 0;
             chipGroups[chip].count += 1;
             if (d.price) chipGroups[chip].prices.push(d.price);
         });
 
-        // Sort by average score descending, take top 20
+        // Sort by average score descending, take top 12 for readability
         const sorted = Object.entries(chipGroups)
             .map(([chip, g]) => ({
                 chip,
@@ -58,30 +68,28 @@ export default function ProcessorChart({ data }) {
                 avgPrice: g.prices.length > 0 ? Math.round(g.prices.reduce((a, b) => a + b, 0) / g.prices.length) : null,
             }))
             .sort((a, b) => b.avgScore - a.avgScore)
-            .slice(0, 20);
+            .slice(0, 12);
 
-        // Shorten labels for display
         const labels = sorted.map(s => {
             let label = s.chip;
-            // Trim long Qualcomm names
-            label = label.replace(/Qualcomm\s+SM\d+-?\w*\s+/i, '');
-            label = label.replace(/MediaTek\s+MT\d+\/?\w*\s*/i, '');
+            label = label.replace(/Qualcomm\s+/i, '');
+            label = label.replace(/MediaTek\s+/i, '');
             label = label.replace(/\s*\(\d+ nm\)/i, '');
-            if (label.length > 28) label = label.substring(0, 28) + '…';
+            if (label.length > 22) label = label.substring(0, 22) + '…';
             return label;
         });
 
-        const colors = sorted.map(s => getChipColor(s.chip));
+        const colors = sorted.map((_, i) => getBarGradientColor(i, sorted.length));
 
         return {
             labels,
             datasets: [{
                 data: sorted.map(s => s.avgScore),
-                backgroundColor: colors.map(c => c + '90'),
-                borderColor: colors,
-                borderWidth: 1,
-                borderRadius: 4,
-                barPercentage: 0.7,
+                backgroundColor: colors.map(c => c),
+                borderColor: colors.map(c => c),
+                borderWidth: 0,
+                borderRadius: 3,
+                barPercentage: 0.75,
                 categoryPercentage: 0.85,
             }],
             _meta: sorted,
@@ -103,20 +111,35 @@ export default function ProcessorChart({ data }) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                indexAxis: 'y',
                 animation: { duration: 800, easing: 'easeOutQuart' },
                 layout: {
-                    padding: { top: 10, right: 20, bottom: 10, left: 5 },
+                    padding: { top: 10, right: 15, bottom: 5, left: 5 },
                 },
                 scales: {
                     x: {
-                        type: 'linear',
                         title: {
                             display: true,
-                            text: 'AVERAGE ANTUTU SCORE',
+                            text: 'PROCESSOR MODEL',
                             color: '#facc15',
                             font: { size: 11, weight: '700', family: "'Inter', sans-serif" },
-                            padding: { top: 10 },
+                            padding: { top: 8 },
+                        },
+                        ticks: {
+                            color: '#facc15',
+                            font: { size: 9, family: "'Inter', sans-serif", weight: '500' },
+                            maxRotation: 45,
+                            minRotation: 25,
+                        },
+                        grid: { display: false },
+                        border: { color: 'rgba(250, 204, 21, 0.15)' },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'BENCHMARK SCORE',
+                            color: '#facc15',
+                            font: { size: 11, weight: '700', family: "'Inter', sans-serif" },
+                            padding: { bottom: 8 },
                         },
                         ticks: {
                             color: '#facc15',
@@ -127,33 +150,17 @@ export default function ProcessorChart({ data }) {
                                 return v;
                             },
                         },
-                        grid: { color: 'rgba(250, 204, 21, 0.06)', drawBorder: false },
-                        border: { color: 'rgba(250, 204, 21, 0.15)' },
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'PROCESSOR / CHIPSET',
-                            color: '#facc15',
-                            font: { size: 11, weight: '700', family: "'Inter', sans-serif" },
-                            padding: { bottom: 10 },
-                        },
-                        ticks: {
-                            color: '#facc15',
-                            font: { size: 10, family: "'Inter', sans-serif", weight: '500' },
-                            mirror: false,
-                        },
-                        grid: { display: false },
+                        grid: { color: 'rgba(250, 204, 21, 0.04)', drawBorder: false },
                         border: { color: 'rgba(250, 204, 21, 0.15)' },
                     },
                 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(8, 20, 50, 0.95)',
+                        backgroundColor: 'rgba(8, 16, 40, 0.95)',
                         titleColor: '#facc15',
                         bodyColor: '#e2e8f0',
-                        borderColor: 'rgba(250, 204, 21, 0.2)',
+                        borderColor: 'rgba(60, 120, 220, 0.3)',
                         borderWidth: 1,
                         cornerRadius: 8,
                         padding: 12,
@@ -201,7 +208,7 @@ export default function ProcessorChart({ data }) {
     }
 
     return (
-        <div className="w-full" style={{ height: '500px' }}>
+        <div className="w-full" style={{ height: '380px' }}>
             <canvas ref={canvasRef} />
         </div>
     );

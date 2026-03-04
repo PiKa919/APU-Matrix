@@ -18,7 +18,7 @@ async function main() {
         brand: d.brand,
         score: d.score
     }));
-    const outPath = new URL('../metallic-newton/antutu_devices.json', import.meta.url).pathname;
+    const outPath = new URL('../../metallic-newton/antutu_devices.json', import.meta.url).pathname;
     fs.writeFileSync(outPath, JSON.stringify(slim, null, 2));
     console.log(`Saved ${slim.length} devices to ${outPath}`);
     await mongoose.disconnect();
