@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import PerformanceChart from '@/components/PerformanceChart';
-import ProcessorChart from '@/components/ProcessorChart';
+import PerformanceChart from '@/components/PerformanceChart.jsx';
+import ProcessorChart from '@/components/ProcessorChart.jsx';
 import { Cpu, RefreshCw, Settings, User, LayoutDashboard, BarChart3, Binary, FileText } from 'lucide-react';
-import Sidebar from '@/components/Filters';
+import Sidebar from '@/components/Filters.jsx';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";

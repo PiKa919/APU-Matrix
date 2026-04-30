@@ -13,6 +13,14 @@ const DeviceSchema = new mongoose.Schema({
         type: Number,
         required: false,
     },
+    priceCurrency: {
+        type: String,
+        required: false,
+    },
+    priceRaw: {
+        type: String,
+        required: false,
+    },
     brand: {
         type: String,
         required: false,
@@ -52,6 +60,25 @@ const DeviceSchema = new mongoose.Schema({
     },
     releaseDate: {
         type: String,
+        required: false,
+    },
+    metadataSources: {
+        brand: { type: String, required: false },
+        price: { type: String, required: false },
+        releaseDate: { type: String, required: false },
+        chipset: { type: String, required: false },
+        ram: { type: String, required: false },
+        storage: { type: String, required: false },
+    },
+    sourceUrls: {
+        gsmarena: { type: String, required: false },
+    },
+    enrichmentConfidence: {
+        type: Number,
+        required: false,
+    },
+    lastEnrichedAt: {
+        type: Date,
         required: false,
     },
     lastUpdated: {

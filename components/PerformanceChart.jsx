@@ -4,6 +4,8 @@ import { useRef, useEffect, useMemo, useState } from 'react';
 import {
     Chart as ChartJS,
     ScatterController,
+    LineController,
+    LineElement,
     PointElement,
     LinearScale,
     Tooltip,
@@ -11,7 +13,7 @@ import {
 } from 'chart.js';
 import { EyeOff, Eye } from 'lucide-react';
 
-ChartJS.register(ScatterController, PointElement, LinearScale, Tooltip, Legend);
+ChartJS.register(ScatterController, LineController, LineElement, PointElement, LinearScale, Tooltip, Legend);
 
 const BRAND_COLORS = {
     'Apple': '#34d399',
