@@ -97,4 +97,24 @@ describe('chart dataset builder', () => {
     expect(onePlus.plottedPrice).toBeNull();
     expect(onePlus.sourceMatches).toEqual([]);
   });
+
+  it('generates unique row ids when names only differ by plus or source duplication', () => {
+    const { rows } = buildPhonePricePerformanceDataset({
+      detailedData: [
+        {
+          processor: 'Snapdragon 8 Elite',
+          phones: [
+            { name: 'Galaxy S25+', brand: 'Samsung', score: 2774381, category: 'android' },
+            { name: 'Galaxy S25', brand: 'Samsung', score: 2646876, category: 'android' },
+            { name: 'REDMI Pad 2', brand: 'Xiaomi', score: 602118, category: 'android_lite' },
+            { name: 'Redmi Pad 2', brand: 'Xiaomi', score: 600630, category: 'android_lite' },
+          ],
+        },
+      ],
+      overrides: [],
+    });
+
+    const ids = rows.map((row) => row.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
 });

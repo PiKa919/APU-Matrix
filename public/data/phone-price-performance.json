@@ -1118,7 +1118,7 @@
     "missingFields": []
   },
   {
-    "id": "galaxy-s25-samsung-snapdragon-8-elite-android",
+    "id": "galaxy-s25-plus-samsung-snapdragon-8-elite-android",
     "phoneName": "Galaxy S25+",
     "phoneBrand": "Samsung",
     "processorName": "Snapdragon 8 Elite",
@@ -1418,7 +1418,7 @@
     "missingFields": []
   },
   {
-    "id": "iqoo-neo10-pro-iqoo-snapdragon-8-elite-android-ai-phone",
+    "id": "iqoo-neo10-pro-plus-iqoo-snapdragon-8-elite-android-ai-phone",
     "phoneName": "iQOO Neo10 Pro+",
     "phoneBrand": "iQOO",
     "processorName": "Snapdragon 8 Elite",
@@ -2434,7 +2434,7 @@
     ]
   },
   {
-    "id": "iqoo-z10-turbo-iqoo-dimensity-9400-android",
+    "id": "iqoo-z10-turbo-plus-iqoo-dimensity-9400-android",
     "phoneName": "iQOO Z10 Turbo+",
     "phoneBrand": "iQOO",
     "processorName": "Dimensity 9400",
@@ -3382,7 +3382,7 @@
     ]
   },
   {
-    "id": "galaxy-tab-s10-samsung-dimensity-9300-android-lite",
+    "id": "galaxy-tab-s10-plus-samsung-dimensity-9300-android-lite",
     "phoneName": "Galaxy Tab S10+",
     "phoneBrand": "Samsung",
     "processorName": "Dimensity 9300",
@@ -3902,7 +3902,7 @@
     ]
   },
   {
-    "id": "generic-mediatek-dimensity9400-generic-dimensity-9400-harvested",
+    "id": "generic-mediatek-dimensity9400-plus-generic-dimensity-9400-plus-harvested",
     "phoneName": "Generic MediaTek Dimensity9400+",
     "phoneBrand": "Generic",
     "processorName": "Dimensity 9400+",
@@ -3962,7 +3962,7 @@
     ]
   },
   {
-    "id": "galaxy-tab-s9-wifi-samsung-snapdragon-8-gen-2-android-lite",
+    "id": "galaxy-tab-s9-plus-wifi-samsung-snapdragon-8-gen-2-android-lite",
     "phoneName": "Galaxy Tab S9+ WiFi",
     "phoneBrand": "Samsung",
     "processorName": "Snapdragon 8 Gen 2",
@@ -4190,7 +4190,7 @@
     ]
   },
   {
-    "id": "poco-pad-x1-poco-snapdragon-7-gen-3-android-lite",
+    "id": "poco-pad-x1-poco-snapdragon-7-plus-gen-3-android-lite",
     "phoneName": "Poco Pad X1",
     "phoneBrand": "POCO",
     "processorName": "Snapdragon 7+ Gen 3",
@@ -4210,7 +4210,7 @@
     ]
   },
   {
-    "id": "mi-pad-7-xiaomi-snapdragon-7-gen-3-android-lite",
+    "id": "mi-pad-7-xiaomi-snapdragon-7-plus-gen-3-android-lite",
     "phoneName": "Mi Pad 7",
     "phoneBrand": "Xiaomi",
     "processorName": "Snapdragon 7+ Gen 3",
@@ -4230,7 +4230,7 @@
     ]
   },
   {
-    "id": "generic-qualcomm-snapdragon7-gen-3-generic-snapdragon-7-gen-3-harvested",
+    "id": "generic-qualcomm-snapdragon7-plus-gen-3-generic-snapdragon-7-plus-gen-3-harvested",
     "phoneName": "Generic Qualcomm Snapdragon7+ Gen 3",
     "phoneBrand": "Generic",
     "processorName": "Snapdragon 7+ Gen 3",
@@ -4570,7 +4570,7 @@
     ]
   },
   {
-    "id": "legion-y700-2023-legion-snapdragon-8-gen-1-android-lite",
+    "id": "legion-y700-2023-legion-snapdragon-8-plus-gen-1-android-lite",
     "phoneName": "Legion Y700 2023",
     "phoneBrand": "Legion",
     "processorName": "Snapdragon 8+ Gen 1",
@@ -4590,7 +4590,7 @@
     ]
   },
   {
-    "id": "generic-qualcomm-snapdragon8-gen-1-generic-snapdragon-8-gen-1-harvested",
+    "id": "generic-qualcomm-snapdragon8-plus-gen-1-generic-snapdragon-8-plus-gen-1-harvested",
     "phoneName": "Generic Qualcomm Snapdragon8+ Gen 1",
     "phoneBrand": "Generic",
     "processorName": "Snapdragon 8+ Gen 1",
@@ -4610,7 +4610,7 @@
     ]
   },
   {
-    "id": "generic-qualcomm-snapdragon8-gen-1-uc-generic-snapdragon-8-gen-1-harvested",
+    "id": "generic-qualcomm-snapdragon8-plus-gen-1-uc-generic-snapdragon-8-plus-gen-1-harvested",
     "phoneName": "Generic Qualcomm Snapdragon8+ Gen 1 UC",
     "phoneBrand": "Generic",
     "processorName": "Snapdragon 8+ Gen 1",
@@ -4650,7 +4650,7 @@
     ]
   },
   {
-    "id": "generic-mediatek-dimensity9300-generic-dimensity-9300-harvested",
+    "id": "generic-mediatek-dimensity9300-plus-generic-dimensity-9300-plus-harvested",
     "phoneName": "Generic MediaTek Dimensity9300+",
     "phoneBrand": "Generic",
     "processorName": "Dimensity 9300+",
@@ -4710,7 +4710,7 @@
     ]
   },
   {
-    "id": "poco-f5-poco-snapdragon-7-gen-2-android",
+    "id": "poco-f5-poco-snapdragon-7-plus-gen-2-android",
     "phoneName": "Poco F5",
     "phoneBrand": "POCO",
     "processorName": "Snapdragon 7+ Gen 2",
@@ -4730,7 +4730,7 @@
     ]
   },
   {
-    "id": "redmi-note-12-turbo-xiaomi-snapdragon-7-gen-2-android-ai-phone",
+    "id": "redmi-note-12-turbo-xiaomi-snapdragon-7-plus-gen-2-android-ai-phone",
     "phoneName": "Redmi Note 12 Turbo",
     "phoneBrand": "Xiaomi",
     "processorName": "Snapdragon 7+ Gen 2",
@@ -4750,7 +4750,7 @@
     ]
   },
   {
-    "id": "generic-qualcomm-snapdragon7-gen-2-generic-snapdragon-7-gen-2-harvested",
+    "id": "generic-qualcomm-snapdragon7-plus-gen-2-generic-snapdragon-7-plus-gen-2-harvested",
     "phoneName": "Generic Qualcomm Snapdragon7+ Gen 2",
     "phoneBrand": "Generic",
     "processorName": "Snapdragon 7+ Gen 2",
@@ -5150,7 +5150,7 @@
     ]
   },
   {
-    "id": "redmi-note-13-pro-xiaomi-dimensity-7200-android",
+    "id": "redmi-note-13-pro-plus-xiaomi-dimensity-7200-android",
     "phoneName": "Redmi Note 13 Pro+",
     "phoneBrand": "Xiaomi",
     "processorName": "Dimensity 7200",
@@ -5210,7 +5210,7 @@
     ]
   },
   {
-    "id": "generic-mediatek-dimensity9200-generic-dimensity-9200-harvested",
+    "id": "generic-mediatek-dimensity9200-plus-generic-dimensity-9200-plus-harvested",
     "phoneName": "Generic MediaTek Dimensity9200+",
     "phoneBrand": "Generic",
     "processorName": "Dimensity 9200+",
@@ -5250,7 +5250,7 @@
     ]
   },
   {
-    "id": "redmi-note-14-pro-xiaomi-snapdragon-7s-gen-3-android",
+    "id": "redmi-note-14-pro-plus-xiaomi-snapdragon-7s-gen-3-android",
     "phoneName": "Redmi Note 14 Pro+",
     "phoneBrand": "Xiaomi",
     "processorName": "Snapdragon 7s Gen 3",
@@ -5706,7 +5706,7 @@
     ]
   },
   {
-    "id": "galaxy-tab-a11-samsung-dimensity-7300-android-lite",
+    "id": "galaxy-tab-a11-plus-samsung-dimensity-7300-android-lite",
     "phoneName": "Galaxy Tab A11+",
     "phoneBrand": "Samsung",
     "processorName": "Dimensity 7300",
@@ -5886,7 +5886,7 @@
     ]
   },
   {
-    "id": "generic-mediatek-dimensity9000-generic-dimensity-9000-harvested",
+    "id": "generic-mediatek-dimensity9000-plus-generic-dimensity-9000-harvested",
     "phoneName": "Generic MediaTek Dimensity9000+",
     "phoneBrand": "Generic",
     "processorName": "Dimensity 9000",
@@ -6306,7 +6306,7 @@
     ]
   },
   {
-    "id": "redmi-pad-2-xiaomi-helio-g100-android-lite",
+    "id": "redmi-pad-2-xiaomi-helio-g100-android-lite-2",
     "phoneName": "Redmi Pad 2",
     "phoneBrand": "Xiaomi",
     "processorName": "Helio G100",
@@ -6446,7 +6446,7 @@
     ]
   },
   {
-    "id": "infinix-hot-60-pro-infinix-helio-g200-android",
+    "id": "infinix-hot-60-pro-plus-infinix-helio-g200-android",
     "phoneName": "Infinix HOT 60 Pro+",
     "phoneBrand": "Infinix",
     "processorName": "Helio G200",
@@ -7246,7 +7246,7 @@
     ]
   },
   {
-    "id": "generic-mediatek-dimensity1000-generic-dimensity-1000-harvested",
+    "id": "generic-mediatek-dimensity1000-plus-generic-dimensity-1000-plus-harvested",
     "phoneName": "Generic MediaTek Dimensity1000+",
     "phoneBrand": "Generic",
     "processorName": "Dimensity 1000+",
@@ -7606,7 +7606,7 @@
     ]
   },
   {
-    "id": "generic-mediatek-dimensity6100-generic-dimensity-6100-harvested",
+    "id": "generic-mediatek-dimensity6100-plus-generic-dimensity-6100-plus-harvested",
     "phoneName": "Generic MediaTek Dimensity6100+",
     "phoneBrand": "Generic",
     "processorName": "Dimensity 6100+",
