@@ -20,6 +20,17 @@ describe('price selection', () => {
     expect(selectPlottedPrice([weakLaunch, strongLaunch], [current])).toBe(strongLaunch);
   });
 
+  it('accepts candidates with USD normalization when INR normalization is absent', () => {
+    const usdOnlyLaunch = {
+      normalizedUSD: 799,
+      priceType: 'launch',
+      source: 'usd-source',
+      confidence: 0.88,
+    };
+
+    expect(selectPlottedPrice([usdOnlyLaunch], [current])).toBe(usdOnlyLaunch);
+  });
+
   it('returns null when no price is available', () => {
     expect(selectPlottedPrice([], [])).toBeNull();
   });

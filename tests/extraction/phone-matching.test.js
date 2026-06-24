@@ -5,6 +5,7 @@ describe('phone matching', () => {
   it('normalizes phone names for matching', () => {
     expect(normalizePhoneName('Samsung Galaxy S26 Ultra 12GB/256GB')).toBe('samsung galaxy s26 ultra');
     expect(normalizePhoneName('Poco F8 Ultra (China)')).toBe('poco f8 ultra');
+    expect(normalizePhoneName('Xiaomi 14 Pro+')).toBe('xiaomi 14 pro plus');
   });
 
   it('scores exact and near matches higher than unrelated phones', () => {
@@ -26,6 +27,19 @@ describe('phone matching', () => {
     );
 
     expect(result.candidate.name).toBe('Poco F8 Ultra');
+    expect(result.confidence).toBeGreaterThan(0.9);
+  });
+
+  it('matches plus-symbol phone names to plus-word source names', () => {
+    const result = bestPhoneMatch(
+      { phoneName: 'Xiaomi 14 Pro+', phoneBrand: 'Xiaomi', processorName: 'Snapdragon 8 Gen 3' },
+      [
+        { name: 'Xiaomi 14 Pro', brand: 'Xiaomi', processorName: 'Snapdragon 8 Gen 3' },
+        { name: 'Xiaomi 14 Pro Plus', brand: 'Xiaomi', processorName: 'Snapdragon 8 Gen 3' },
+      ]
+    );
+
+    expect(result.candidate.name).toBe('Xiaomi 14 Pro Plus');
     expect(result.confidence).toBeGreaterThan(0.9);
   });
 });
