@@ -41,3 +41,18 @@ Changes:
 Verification:
 - RED before implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` failed with three expected regressions.
 - GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 9 tests passed.
+
+## Controller Fix: Mixed Currency Tie-Breaks And Plus Variant Guard
+
+Applied after re-review found two remaining gaps:
+- Price selection compared `normalizedINR` and `normalizedUSD` values as the same unit during equal-confidence tie-breaks.
+- Phone matching still allowed a Plus target to attach to a non-Plus candidate above threshold when no Plus candidate existed.
+
+Changes:
+- Added a unit-rank tie-break so INR-normalized prices win mixed-unit ties, while USD-only candidates remain valid fallbacks.
+- Added a Plus-variant guard so the `plus` token must agree between target and candidate names.
+- Added regression tests for mixed INR/USD tie-breaks and Plus-to-non-Plus overmatching.
+
+Verification:
+- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` failed with the two expected regressions.
+- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 11 tests passed.

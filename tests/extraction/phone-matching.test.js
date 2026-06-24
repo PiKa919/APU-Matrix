@@ -42,4 +42,15 @@ describe('phone matching', () => {
     expect(result.candidate.name).toBe('Xiaomi 14 Pro Plus');
     expect(result.confidence).toBeGreaterThan(0.9);
   });
+
+  it('does not match a plus target to a non-plus candidate above threshold', () => {
+    const result = bestPhoneMatch(
+      { phoneName: 'Xiaomi 14 Pro+', phoneBrand: 'Xiaomi', processorName: 'Snapdragon 8 Gen 3' },
+      [
+        { name: 'Xiaomi 14 Pro', brand: 'Xiaomi', processorName: 'Snapdragon 8 Gen 3' },
+      ]
+    );
+
+    expect(result).toBeNull();
+  });
 });

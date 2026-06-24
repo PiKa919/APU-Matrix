@@ -31,6 +31,23 @@ describe('price selection', () => {
     expect(selectPlottedPrice([usdOnlyLaunch], [current])).toBe(usdOnlyLaunch);
   });
 
+  it('does not compare INR and USD amounts as the same unit for tie-breaks', () => {
+    const inrLaunch = {
+      normalizedINR: 65000,
+      priceType: 'launch',
+      source: 'inr-source',
+      confidence: 0.88,
+    };
+    const usdOnlyLaunch = {
+      normalizedUSD: 799,
+      priceType: 'launch',
+      source: 'usd-source',
+      confidence: 0.88,
+    };
+
+    expect(selectPlottedPrice([inrLaunch, usdOnlyLaunch], [])).toBe(inrLaunch);
+  });
+
   it('returns null when no price is available', () => {
     expect(selectPlottedPrice([], [])).toBeNull();
   });
