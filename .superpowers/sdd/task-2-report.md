@@ -72,3 +72,50 @@ Direct module spot-check after implementation using `node --input-type=module`:
 - Result: passed, 1 file / 5 tests.
 - `npm test`
 - Result: still fails in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`
+
+## Final Legacy Coverage Fix
+
+Closed the remaining Task 2 normalization findings by adding explicit legacy-generation coverage without widening the module beyond deterministic family helpers.
+
+- Added regression coverage for harvested 3-digit Dimensity models:
+  - `Dimensity 920` -> brand `MediaTek`, series `mid`, generation `Dimensity 920`
+  - `Dimensity 820` -> brand `MediaTek`, series `premium`, generation `Dimensity 820`
+  - `Dimensity 900` -> brand `MediaTek`, series `mid`, generation `Dimensity 900`
+- Added regression coverage for harvested legacy Snapdragon SKUs:
+  - `Snapdragon 888`, `870`, `865` -> `flagship`
+  - `Snapdragon 782G`, `778G Plus`, `778G`, `765G` -> `premium`
+  - `Snapdragon 695`, `680`, `665` -> `mid`
+  - `Snapdragon 460` -> `entry`
+- Replaced the narrow Snapdragon and Dimensity metadata fallthrough with compact helper-based extraction:
+  - Snapdragon series now keys off the normalized generation token prefix, so `8`, `8s`, `7s`, `7+`, `782G`, and similar legacy SKUs stay in their expected families.
+  - Dimensity generation extraction now accepts both 3-digit and 4-digit numeric families, preserving unique generation keys for older `820`/`900`/`920` names.
+  - Dimensity series classification now distinguishes `9000`/`8000`/`7000`/`6000` families and the older `9xx`/`8xx` families without touching the Helio taxonomy.
+- Preserved earlier passing behavior: repo-real prefixes, Chinese MediaTek/Helio inputs, glued names, uppercase Tensor, Snapdragon `8s`/`7s`/`4s`, and existing Helio taxonomy.
+
+## Spot Check
+
+Direct module spot-check using `node --input-type=module`:
+
+- `Dimensity 920` -> `MediaTek | mid | Dimensity 920`
+- `Dimensity 820` -> `MediaTek | premium | Dimensity 820`
+- `Dimensity 900` -> `MediaTek | mid | Dimensity 900`
+- `Snapdragon 888` -> `Snapdragon | flagship | 888`
+- `Snapdragon 870` -> `Snapdragon | flagship | 870`
+- `Snapdragon 865` -> `Snapdragon | flagship | 865`
+- `Snapdragon 782G` -> `Snapdragon | premium | 782G`
+- `Snapdragon 778G Plus` -> `Snapdragon | premium | 778G Plus`
+- `Snapdragon 778G` -> `Snapdragon | premium | 778G`
+- `Snapdragon 765G` -> `Snapdragon | premium | 765G`
+- `Snapdragon 695` -> `Snapdragon | mid | 695`
+- `Snapdragon 680` -> `Snapdragon | mid | 680`
+- `Snapdragon 665` -> `Snapdragon | mid | 665`
+- `Snapdragon 460` -> `Snapdragon | entry | 460`
+
+## Verification
+
+- `npm test -- tests/extraction/processor-normalization.test.js`
+- Result: passed, 1 file / 7 tests.
+- `node --input-type=module` spot-check for Dimensity `920`/`820`/`900` and the listed legacy Snapdragon SKUs
+- Result: all requested names resolved to the expected brand, series, and generation values.
+- `npm test`
+- Result: still fails in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`

@@ -187,4 +187,106 @@ describe('processor normalization', () => {
       processorGeneration: 'Helio X30',
     });
   });
+
+  it('keeps legacy Dimensity generations distinct across harvested 3-digit models', () => {
+    expect(getProcessorMetadata('Dimensity 920')).toEqual({
+      processorName: 'Dimensity 920',
+      processorBrand: 'MediaTek',
+      processorSeries: 'mid',
+      processorGeneration: 'Dimensity 920',
+    });
+
+    expect(getProcessorMetadata('Dimensity 820')).toEqual({
+      processorName: 'Dimensity 820',
+      processorBrand: 'MediaTek',
+      processorSeries: 'premium',
+      processorGeneration: 'Dimensity 820',
+    });
+
+    expect(getProcessorMetadata('Dimensity 900')).toEqual({
+      processorName: 'Dimensity 900',
+      processorBrand: 'MediaTek',
+      processorSeries: 'mid',
+      processorGeneration: 'Dimensity 900',
+    });
+  });
+
+  it('classifies harvested legacy Snapdragon generations instead of falling through to other', () => {
+    expect(getProcessorMetadata('Snapdragon 888')).toEqual({
+      processorName: 'Snapdragon 888',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'flagship',
+      processorGeneration: '888',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 870')).toEqual({
+      processorName: 'Snapdragon 870',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'flagship',
+      processorGeneration: '870',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 865')).toEqual({
+      processorName: 'Snapdragon 865',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'flagship',
+      processorGeneration: '865',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 782G')).toEqual({
+      processorName: 'Snapdragon 782G',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'premium',
+      processorGeneration: '782G',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 778G Plus')).toEqual({
+      processorName: 'Snapdragon 778G Plus',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'premium',
+      processorGeneration: '778G Plus',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 778G')).toEqual({
+      processorName: 'Snapdragon 778G',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'premium',
+      processorGeneration: '778G',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 765G')).toEqual({
+      processorName: 'Snapdragon 765G',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'premium',
+      processorGeneration: '765G',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 695')).toEqual({
+      processorName: 'Snapdragon 695',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'mid',
+      processorGeneration: '695',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 680')).toEqual({
+      processorName: 'Snapdragon 680',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'mid',
+      processorGeneration: '680',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 665')).toEqual({
+      processorName: 'Snapdragon 665',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'mid',
+      processorGeneration: '665',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 460')).toEqual({
+      processorName: 'Snapdragon 460',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'entry',
+      processorGeneration: '460',
+    });
+  });
 });
