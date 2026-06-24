@@ -23,3 +23,18 @@ Implemented the processor normalization utility in `lib/extraction/processor-nor
 - `npm test`
 - Result: failed in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`
 
+## Follow-up Fix
+
+Addressed the remaining normalization findings:
+
+- Preserved Helio names under the `联发科技` prefix instead of rewriting every MediaTek raw input to `Dimensity`.
+- Kept `联发科技 天玑9500` on the Dimensity path.
+- Classified Snapdragon `7s` models as `premium` and `4s` models as `entry`.
+- Broadened Helio taxonomy to match the repo examples for `G100`, `G99`, `G96`, `G95`, `G85`, `G70`, `G35`, `P35`, and `X30`.
+
+## Verification
+
+- `npm test -- tests/extraction/processor-normalization.test.js`
+- Result: passed, 1 file / 4 tests.
+- `npm test`
+- Result: still fails in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`
