@@ -80,4 +80,42 @@ describe('phone matching', () => {
     expect(result.candidate.name).toBe('One Plus 15');
     expect(result.confidence).toBeGreaterThan(0.9);
   });
+
+  it('does not match different alphanumeric model series above threshold', () => {
+    expect(bestPhoneMatch(
+      { phoneName: 'Galaxy A55', phoneBrand: 'Samsung', processorName: 'Exynos 1480' },
+      [{ name: 'Samsung Galaxy S55', brand: 'Samsung', processorName: 'Exynos 1480' }]
+    )).toBeNull();
+
+    expect(bestPhoneMatch(
+      { phoneName: 'iPhone 16', phoneBrand: 'Apple', processorName: 'A18' },
+      [{ name: 'Apple iPhone 16e', brand: 'Apple', processorName: 'A18' }]
+    )).toBeNull();
+  });
+
+  it('matches compact and spaced model aliases', () => {
+    const realme = bestPhoneMatch(
+      { phoneName: 'Realme GT 7 Pro', phoneBrand: 'Realme', processorName: 'Snapdragon 8 Elite' },
+      [{ name: 'Realme GT7 Pro', brand: 'Realme', processorName: 'Snapdragon 8 Elite' }]
+    );
+    const oneplus = bestPhoneMatch(
+      { phoneName: 'OnePlus 12R', phoneBrand: 'OnePlus', processorName: 'Snapdragon 8 Gen 2' },
+      [{ name: 'OnePlus 12 R', brand: 'OnePlus', processorName: 'Snapdragon 8 Gen 2' }]
+    );
+
+    expect(realme.candidate.name).toBe('Realme GT7 Pro');
+    expect(realme.confidence).toBeGreaterThan(0.75);
+    expect(oneplus.candidate.name).toBe('OnePlus 12 R');
+    expect(oneplus.confidence).toBeGreaterThan(0.75);
+  });
+
+  it('matches FE and Fan Edition variant aliases', () => {
+    const result = bestPhoneMatch(
+      { phoneName: 'Galaxy S24 FE', phoneBrand: 'Samsung', processorName: 'Exynos 2400e' },
+      [{ name: 'Samsung Galaxy S24 Fan Edition', brand: 'Samsung', processorName: 'Exynos 2400e' }]
+    );
+
+    expect(result.candidate.name).toBe('Samsung Galaxy S24 Fan Edition');
+    expect(result.confidence).toBeGreaterThan(0.75);
+  });
 });

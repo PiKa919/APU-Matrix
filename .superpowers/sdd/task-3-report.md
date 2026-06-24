@@ -69,3 +69,20 @@ Changes:
 Verification:
 - RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the new overmatch and `One Plus` cases.
 - GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 13 tests passed.
+
+## Controller Fix: Alphanumeric Model Alias Matching
+
+Applied after the second Task 3 review found three matcher gaps:
+- Digit-only model compatibility allowed cross-series false positives such as `A55` / `S55` and `16` / `16e`.
+- Compact/spaced aliases such as `GT7` / `GT 7` and `12R` / `12 R` failed to match.
+- `FE` / `Fan Edition` aliases were treated as incompatible.
+
+Changes:
+- Added regression tests for alphanumeric series mismatches, compact/spaced aliases, and `FE` / `Fan Edition`.
+- Canonicalized compact model aliases during phone-name normalization.
+- Replaced digit-only model compatibility with full digit-bearing model identifiers.
+- Mapped `Fan Edition` to `FE` before stop-word filtering.
+
+Verification:
+- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the three new review regressions.
+- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 16 tests passed.
