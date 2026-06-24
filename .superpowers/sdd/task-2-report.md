@@ -119,3 +119,72 @@ Direct module spot-check using `node --input-type=module`:
 - Result: all requested names resolved to the expected brand, series, and generation values.
 - `npm test`
 - Result: still fails in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`
+
+## Canonical Override Fix
+
+Added explicit in-module override helpers for the remaining Task 2 architecture gaps without widening the existing regex heuristics or introducing external data files.
+
+- Added canonical name override handling so Snapdragon `Plus` and `+` variants collapse to the repo’s curated canonical form:
+  - `高通 骁龙778G Plus` -> `Snapdragon 778G+`
+  - `Snapdragon 778G Plus` -> `Snapdragon 778G+`
+  - `Snapdragon 778G+` -> `Snapdragon 778G+`
+- Added compact explicit series overrides for the reviewed legacy exceptions:
+  - `Dimensity 1000+` -> `flagship`
+  - `Dimensity 800` -> `mid`
+  - `Dimensity 800U` -> `mid`
+  - `Snapdragon 720G` -> `mid`
+  - `Exynos 990`, `Exynos 9825`, `Exynos 9820` -> `flagship`
+- Added explicit generation overrides where heuristic extraction was too coarse:
+  - `Snapdragon 778G+` -> generation `778G+`
+  - `Dimensity 1000+` -> generation `Dimensity 1000`
+  - `Dimensity 800U` -> generation `Dimensity 800`
+- Preserved existing expected behavior for:
+  - `Dimensity 920`, `Dimensity 900`, `Dimensity 820`, `Dimensity 7300-Ultra`, `Dimensity 9000+`, `Dimensity 8100-Max`
+  - `Snapdragon 782G`, `778G`, `765G`, `695`, `680`, `665`, `460`, `888`, `870`, `865`, and newer `8/7/6/4 Gen` families
+  - `Exynos 1xxx` as `premium` and `Exynos 2xxx` as `flagship`
+
+## Spot Check
+
+Direct module spot-check using `node --input-type=module` for the exact reviewed names:
+
+- Canonicalization
+  - `高通 骁龙778G Plus` -> `Snapdragon 778G+`
+  - `Snapdragon 778G Plus` -> `Snapdragon 778G+`
+  - `Snapdragon 778G+` -> `Snapdragon 778G+`
+- Legacy Dimensity
+  - `Dimensity 1000+` -> `flagship | Dimensity 1000`
+  - `Dimensity 800` -> `mid | Dimensity 800`
+  - `Dimensity 800U` -> `mid | Dimensity 800`
+  - `Dimensity 920` -> `mid | Dimensity 920`
+  - `Dimensity 900` -> `mid | Dimensity 900`
+  - `Dimensity 820` -> `premium | Dimensity 820`
+  - `Dimensity 7300-Ultra` -> `mid | Dimensity 7300`
+  - `Dimensity 9000+` -> `flagship | Dimensity 9000`
+  - `Dimensity 8100-Max` -> `premium | Dimensity 8100`
+- Legacy Snapdragon
+  - `Snapdragon 720G` -> `mid | 720G`
+  - `Snapdragon 782G` -> `premium | 782G`
+  - `Snapdragon 778G+` -> `premium | 778G+`
+  - `Snapdragon 778G` -> `premium | 778G`
+  - `Snapdragon 765G` -> `premium | 765G`
+  - `Snapdragon 695` -> `mid | 695`
+  - `Snapdragon 680` -> `mid | 680`
+  - `Snapdragon 665` -> `mid | 665`
+  - `Snapdragon 460` -> `entry | 460`
+  - `Snapdragon 888` -> `flagship | 888`
+  - `Snapdragon 870` -> `flagship | 870`
+  - `Snapdragon 865` -> `flagship | 865`
+- Exynos
+  - `Exynos 990` -> `flagship | Exynos 990`
+  - `Exynos 9825` -> `flagship | Exynos 9825`
+  - `Exynos 9820` -> `flagship | Exynos 9820`
+  - control cases preserved: `Exynos 1480` -> `premium | Exynos 1480`; `Exynos 2400` -> `flagship | Exynos 2400`
+
+## Verification
+
+- `npm test -- tests/extraction/processor-normalization.test.js`
+- Result: passed, 1 file / 8 tests.
+- `node --input-type=module` spot-check for all reviewed canonicalization, Dimensity, Snapdragon, and Exynos cases
+- Result: all exact reviewed cases resolved to the expected canonical name, series, and generation values.
+- `npm test`
+- Result: still fails in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`

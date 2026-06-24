@@ -6,6 +6,9 @@ describe('processor normalization', () => {
     expect(normalizeProcessorName('Qualcomm Snapdragon 8 Elite Gen 5')).toBe('Snapdragon 8 Elite Gen 5');
     expect(normalizeProcessorName('S-8 Elite Gen 5')).toBe('Snapdragon 8 Elite Gen 5');
     expect(normalizeProcessorName('高通 骁龙8 至尊版 Gen5')).toBe('Snapdragon 8 Elite Gen 5');
+    expect(normalizeProcessorName('高通 骁龙778G Plus')).toBe('Snapdragon 778G+');
+    expect(normalizeProcessorName('Snapdragon 778G Plus')).toBe('Snapdragon 778G+');
+    expect(normalizeProcessorName('Snapdragon 778G+')).toBe('Snapdragon 778G+');
   });
 
   it('normalizes MediaTek aliases', () => {
@@ -189,6 +192,13 @@ describe('processor normalization', () => {
   });
 
   it('keeps legacy Dimensity generations distinct across harvested 3-digit models', () => {
+    expect(getProcessorMetadata('Dimensity 1000+')).toEqual({
+      processorName: 'Dimensity 1000+',
+      processorBrand: 'MediaTek',
+      processorSeries: 'flagship',
+      processorGeneration: 'Dimensity 1000',
+    });
+
     expect(getProcessorMetadata('Dimensity 920')).toEqual({
       processorName: 'Dimensity 920',
       processorBrand: 'MediaTek',
@@ -201,6 +211,20 @@ describe('processor normalization', () => {
       processorBrand: 'MediaTek',
       processorSeries: 'premium',
       processorGeneration: 'Dimensity 820',
+    });
+
+    expect(getProcessorMetadata('Dimensity 800')).toEqual({
+      processorName: 'Dimensity 800',
+      processorBrand: 'MediaTek',
+      processorSeries: 'mid',
+      processorGeneration: 'Dimensity 800',
+    });
+
+    expect(getProcessorMetadata('Dimensity 800U')).toEqual({
+      processorName: 'Dimensity 800U',
+      processorBrand: 'MediaTek',
+      processorSeries: 'mid',
+      processorGeneration: 'Dimensity 800',
     });
 
     expect(getProcessorMetadata('Dimensity 900')).toEqual({
@@ -241,10 +265,10 @@ describe('processor normalization', () => {
     });
 
     expect(getProcessorMetadata('Snapdragon 778G Plus')).toEqual({
-      processorName: 'Snapdragon 778G Plus',
+      processorName: 'Snapdragon 778G+',
       processorBrand: 'Snapdragon',
       processorSeries: 'premium',
-      processorGeneration: '778G Plus',
+      processorGeneration: '778G+',
     });
 
     expect(getProcessorMetadata('Snapdragon 778G')).toEqual({
@@ -259,6 +283,13 @@ describe('processor normalization', () => {
       processorBrand: 'Snapdragon',
       processorSeries: 'premium',
       processorGeneration: '765G',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 720G')).toEqual({
+      processorName: 'Snapdragon 720G',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'mid',
+      processorGeneration: '720G',
     });
 
     expect(getProcessorMetadata('Snapdragon 695')).toEqual({
@@ -287,6 +318,29 @@ describe('processor normalization', () => {
       processorBrand: 'Snapdragon',
       processorSeries: 'entry',
       processorGeneration: '460',
+    });
+  });
+
+  it('classifies older Exynos flagship generations with explicit exceptions', () => {
+    expect(getProcessorMetadata('Exynos 990')).toEqual({
+      processorName: 'Exynos 990',
+      processorBrand: 'Exynos',
+      processorSeries: 'flagship',
+      processorGeneration: 'Exynos 990',
+    });
+
+    expect(getProcessorMetadata('Exynos 9825')).toEqual({
+      processorName: 'Exynos 9825',
+      processorBrand: 'Exynos',
+      processorSeries: 'flagship',
+      processorGeneration: 'Exynos 9825',
+    });
+
+    expect(getProcessorMetadata('Exynos 9820')).toEqual({
+      processorName: 'Exynos 9820',
+      processorBrand: 'Exynos',
+      processorSeries: 'flagship',
+      processorGeneration: 'Exynos 9820',
     });
   });
 });
