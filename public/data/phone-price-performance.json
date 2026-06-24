@@ -10,14 +10,39 @@
     "antutuScore": 3963575,
     "antutuRank": 1,
     "category": "android",
-    "releaseDate": null,
-    "plottedPrice": null,
+    "releaseDate": "2025-11-19",
+    "plottedPrice": {
+      "amount": 749,
+      "currency": "USD",
+      "normalizedINR": 65163,
+      "normalizedUSD": 749,
+      "source": "the-verge",
+      "rawValue": "USD 749",
+      "priceType": "current",
+      "confidence": 0.88
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 749,
+        "currency": "USD",
+        "normalizedINR": 65163,
+        "normalizedUSD": 749,
+        "source": "the-verge",
+        "rawValue": "USD 749",
+        "priceType": "current",
+        "confidence": 0.88
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "the-verge",
+        "matchedName": "Red Magic 11 Pro",
+        "url": "https://www.theverge.com/news/812391/redmagics-liquid-cooled-gaming-phone-starts-at-749",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "oneplus-pad-4-oneplus-snapdragon-8-elite-gen-5-android-lite",
@@ -112,14 +137,14 @@
     "category": "android",
     "releaseDate": "2025-11-26",
     "plottedPrice": {
-      "amount": 840,
-      "currency": "USD",
-      "normalizedINR": 73080,
-      "normalizedUSD": 840,
-      "source": "manual-seed",
-      "rawValue": "USD 840",
-      "priceType": "launch",
-      "confidence": 0.85
+      "amount": 70979,
+      "currency": "INR",
+      "normalizedINR": 70979,
+      "normalizedUSD": 815.85,
+      "source": "existing-data",
+      "rawValue": "INR 70979",
+      "priceType": "current",
+      "confidence": 0.65
     },
     "launchPrices": [
       {
@@ -182,10 +207,10 @@
       "currency": "INR",
       "normalizedINR": 54999,
       "normalizedUSD": 632.17,
-      "source": "manual-seed",
-      "rawValue": "INR 54,999",
-      "priceType": "launch",
-      "confidence": 0.95
+      "source": "existing-data",
+      "rawValue": "INR 54999",
+      "priceType": "current",
+      "confidence": 0.65
     },
     "launchPrices": [
       {
@@ -306,10 +331,10 @@
       "currency": "INR",
       "normalizedINR": 116990,
       "normalizedUSD": 1344.71,
-      "source": "manual-seed",
-      "rawValue": "INR 116,990",
-      "priceType": "launch",
-      "confidence": 0.9
+      "source": "existing-data",
+      "rawValue": "INR 116990",
+      "priceType": "current",
+      "confidence": 0.65
     },
     "launchPrices": [
       {
@@ -452,10 +477,10 @@
       "currency": "INR",
       "normalizedINR": 116990,
       "normalizedUSD": 1344.71,
-      "source": "manual-seed",
-      "rawValue": "INR 116,990",
-      "priceType": "launch",
-      "confidence": 0.9
+      "source": "existing-data",
+      "rawValue": "INR 116990",
+      "priceType": "current",
+      "confidence": 0.65
     },
     "launchPrices": [
       {
@@ -788,14 +813,39 @@
     "antutuScore": 3234947,
     "antutuRank": 5,
     "category": "android_lite",
-    "releaseDate": "Oct 2024",
-    "plottedPrice": null,
+    "releaseDate": "2025-06-05",
+    "plottedPrice": {
+      "amount": 699.99,
+      "currency": "USD",
+      "normalizedINR": 60899,
+      "normalizedUSD": 699.99,
+      "source": "oneplus-press-release",
+      "rawValue": "USD 699.99",
+      "priceType": "current",
+      "confidence": 0.9
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 699.99,
+        "currency": "USD",
+        "normalizedINR": 60899,
+        "normalizedUSD": 699.99,
+        "source": "oneplus-press-release",
+        "rawValue": "USD 699.99",
+        "priceType": "current",
+        "confidence": 0.9
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "oneplus-press-release",
+        "matchedName": "OnePlus Pad 3",
+        "url": "https://www.oneplus.com/us/press/press-release/oneplus-launches-its-flagship-android-tablet-oneplus-pad3-in-the-united-states-and-canada",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "red-magic-pad-3-pro-red-magic-snapdragon-8-elite-android-lite",
@@ -3372,14 +3422,39 @@
     "antutuScore": 2237496,
     "antutuRank": 21,
     "category": "android_lite",
-    "releaseDate": "Nov 2023",
-    "plottedPrice": null,
+    "releaseDate": "2024-09-26",
+    "plottedPrice": {
+      "amount": 93999,
+      "currency": "INR",
+      "normalizedINR": 93999,
+      "normalizedUSD": 1080.45,
+      "source": "flipkart",
+      "rawValue": "INR 93,999",
+      "priceType": "current",
+      "confidence": 0.82
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 93999,
+        "currency": "INR",
+        "normalizedINR": 93999,
+        "normalizedUSD": 1080.45,
+        "source": "flipkart",
+        "rawValue": "INR 93,999",
+        "priceType": "current",
+        "confidence": 0.82
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "flipkart",
+        "matchedName": "Galaxy Tab S10 Ultra",
+        "url": "https://www.flipkart.com/samsung-galaxy-tab-s10-ultra-12-gb-ram-256-rom-14-6-inch-wi-fi-only-gaming-tablet-moonstone-gray/p/itmb5297e0ae3d7d",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "galaxy-tab-s10-plus-samsung-dimensity-9300-android-lite",
@@ -3392,14 +3467,39 @@
     "antutuScore": 2165853,
     "antutuRank": 23,
     "category": "android_lite",
-    "releaseDate": "Nov 2023",
-    "plottedPrice": null,
+    "releaseDate": "2024-09-26",
+    "plottedPrice": {
+      "amount": 100999,
+      "currency": "INR",
+      "normalizedINR": 100999,
+      "normalizedUSD": 1160.91,
+      "source": "flipkart",
+      "rawValue": "INR 1,00,999",
+      "priceType": "current",
+      "confidence": 0.82
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 100999,
+        "currency": "INR",
+        "normalizedINR": 100999,
+        "normalizedUSD": 1160.91,
+        "source": "flipkart",
+        "rawValue": "INR 1,00,999",
+        "priceType": "current",
+        "confidence": 0.82
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "flipkart",
+        "matchedName": "Galaxy Tab S10+",
+        "url": "https://www.flipkart.com/samsung-galaxy-tab-s10-12-gb-ram-256-rom-12-4-inch-wi-fi-only-gaming-tablet-platinum-silver/p/itm07fddd91caecf",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "mi-14t-pro-xiaomi-dimensity-9300-android",
@@ -3512,14 +3612,50 @@
     "antutuScore": 1956547,
     "antutuRank": 43,
     "category": "android",
-    "releaseDate": null,
-    "plottedPrice": null,
-    "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "releaseDate": "2025-01-02",
+    "plottedPrice": {
+      "amount": 330,
+      "currency": "USD",
+      "normalizedINR": 28710,
+      "normalizedUSD": 330,
+      "source": "kimovil",
+      "rawValue": "USD 330",
+      "priceType": "current",
+      "confidence": 0.72
+    },
+    "launchPrices": [
+      {
+        "amount": 1999,
+        "currency": "CNY",
+        "normalizedINR": 22989,
+        "normalizedUSD": 264.24,
+        "source": "kimovil",
+        "rawValue": "CNY 1,999",
+        "priceType": "launch",
+        "confidence": 0.84
+      }
+    ],
+    "currentPrices": [
+      {
+        "amount": 330,
+        "currency": "USD",
+        "normalizedINR": 28710,
+        "normalizedUSD": 330,
+        "source": "kimovil",
+        "rawValue": "USD 330",
+        "priceType": "current",
+        "confidence": 0.72
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "kimovil",
+        "matchedName": "REDMI Turbo 4",
+        "url": "https://www.kimovil.com/en/where-to-buy-xiaomi-redmi-turbo-4",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "poco-x7-pro-poco-dimensity-8400-android",
@@ -3532,14 +3668,39 @@
     "antutuScore": 1879628,
     "antutuRank": 46,
     "category": "android",
-    "releaseDate": null,
-    "plottedPrice": null,
+    "releaseDate": "2025-01-09",
+    "plottedPrice": {
+      "amount": 23999,
+      "currency": "INR",
+      "normalizedINR": 23999,
+      "normalizedUSD": 275.85,
+      "source": "flipkart",
+      "rawValue": "INR 23,999",
+      "priceType": "current",
+      "confidence": 0.86
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 23999,
+        "currency": "INR",
+        "normalizedINR": 23999,
+        "normalizedUSD": 275.85,
+        "source": "flipkart",
+        "rawValue": "INR 23,999",
+        "priceType": "current",
+        "confidence": 0.86
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "flipkart",
+        "matchedName": "Poco X7 Pro",
+        "url": "https://www.flipkart.com/poco-x7-pro-5g-obsidian-black-256-gb/p/itm83a82908d7dbb/",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "generic-mediatek-dimensity8400-full-generic-dimensity-8400-harvested",
@@ -3632,14 +3793,39 @@
     "antutuScore": 1904372,
     "antutuRank": 20,
     "category": "ios",
-    "releaseDate": null,
-    "plottedPrice": null,
+    "releaseDate": "2024-09-20",
+    "plottedPrice": {
+      "amount": 79900,
+      "currency": "INR",
+      "normalizedINR": 79900,
+      "normalizedUSD": 918.39,
+      "source": "apple-in",
+      "rawValue": "INR 79,900",
+      "priceType": "current",
+      "confidence": 0.95
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 79900,
+        "currency": "INR",
+        "normalizedINR": 79900,
+        "normalizedUSD": 918.39,
+        "source": "apple-in",
+        "rawValue": "INR 79,900",
+        "priceType": "current",
+        "confidence": 0.95
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "apple-in",
+        "matchedName": "iPhone 16 Plus",
+        "url": "https://www.apple.com/in/shop/buy-iphone/iphone-16/6.7%22-display-128gb-black",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "iphone-16-apple-a18-ios",
@@ -3652,14 +3838,39 @@
     "antutuScore": 1893051,
     "antutuRank": 21,
     "category": "ios",
-    "releaseDate": null,
-    "plottedPrice": null,
+    "releaseDate": "2024-09-20",
+    "plottedPrice": {
+      "amount": 69900,
+      "currency": "INR",
+      "normalizedINR": 69900,
+      "normalizedUSD": 803.45,
+      "source": "apple-in",
+      "rawValue": "INR 69,900",
+      "priceType": "current",
+      "confidence": 0.95
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 69900,
+        "currency": "INR",
+        "normalizedINR": 69900,
+        "normalizedUSD": 803.45,
+        "source": "apple-in",
+        "rawValue": "INR 69,900",
+        "priceType": "current",
+        "confidence": 0.95
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "apple-in",
+        "matchedName": "iPhone 16",
+        "url": "https://www.apple.com/in/shop/buy-iphone/iphone-16",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "iphone-16e-apple-a18-ios",
@@ -4160,14 +4371,39 @@
     "antutuScore": 1724111,
     "antutuRank": 24,
     "category": "ios",
-    "releaseDate": null,
-    "plottedPrice": null,
+    "releaseDate": "2024-09-20",
+    "plottedPrice": {
+      "amount": 107900,
+      "currency": "INR",
+      "normalizedINR": 107900,
+      "normalizedUSD": 1240.23,
+      "source": "reliance-digital",
+      "rawValue": "INR 1,07,900",
+      "priceType": "current",
+      "confidence": 0.82
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 107900,
+        "currency": "INR",
+        "normalizedINR": 107900,
+        "normalizedUSD": 1240.23,
+        "source": "reliance-digital",
+        "rawValue": "INR 1,07,900",
+        "priceType": "current",
+        "confidence": 0.82
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "reliance-digital",
+        "matchedName": "iPhone 16 Pro",
+        "url": "https://www.reliancedigital.in/collection/iphone-16-pro-19-02",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "iphone-16-pro-max-apple-a18-pro-ios",
@@ -4180,14 +4416,39 @@
     "antutuScore": 1689843,
     "antutuRank": 26,
     "category": "ios",
-    "releaseDate": null,
-    "plottedPrice": null,
+    "releaseDate": "2024-09-20",
+    "plottedPrice": {
+      "amount": 134900,
+      "currency": "INR",
+      "normalizedINR": 134900,
+      "normalizedUSD": 1550.57,
+      "source": "flipkart",
+      "rawValue": "INR 1,34,900",
+      "priceType": "current",
+      "confidence": 0.82
+    },
     "launchPrices": [],
-    "currentPrices": [],
-    "sourceMatches": [],
-    "missingFields": [
-      "price"
-    ]
+    "currentPrices": [
+      {
+        "amount": 134900,
+        "currency": "INR",
+        "normalizedINR": 134900,
+        "normalizedUSD": 1550.57,
+        "source": "flipkart",
+        "rawValue": "INR 1,34,900",
+        "priceType": "current",
+        "confidence": 0.82
+      }
+    ],
+    "sourceMatches": [
+      {
+        "source": "flipkart",
+        "matchedName": "iPhone 16 Pro Max",
+        "url": "https://www.flipkart.com/apple-iphone-16-pro-max-desert-titanium-256-gb/p/itmb102b8a51100e",
+        "confidence": 1
+      }
+    ],
+    "missingFields": []
   },
   {
     "id": "poco-pad-x1-poco-snapdragon-7-plus-gen-3-android-lite",

@@ -50,7 +50,8 @@ describe('PhonePricePerformanceChart', () => {
 
     expect(screen.getByText('Phone price performance')).toBeInTheDocument();
     expect(screen.getByText('2 plotted')).toBeInTheDocument();
-    expect(screen.getByText('1 current fallback')).toBeInTheDocument();
+    expect(screen.getByText('1 current price')).toBeInTheDocument();
+    expect(screen.getByText('1 launch fallback')).toBeInTheDocument();
     expect(screen.getByLabelText('phone price performance scatter plot')).toBeInTheDocument();
   });
 

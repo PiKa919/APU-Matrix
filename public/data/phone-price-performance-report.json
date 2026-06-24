@@ -1,9 +1,11 @@
 {
   "totalRows": 315,
-  "plottedRows": 48,
-  "launchPriceRows": 4,
-  "currentFallbackRows": 44,
-  "missingPriceRows": 267,
+  "plottedRows": 58,
+  "currentPriceRows": 58,
+  "launchFallbackRows": 0,
+  "launchPriceRows": 0,
+  "currentFallbackRows": 58,
+  "missingPriceRows": 257,
   "processorBrands": {
     "Exynos": 11,
     "Kirin": 10,
@@ -20,5 +22,5 @@
     "other": 13,
     "premium": 59
   },
-  "generatedAt": "2026-06-24T20:08:30.448Z"
+  "generatedAt": "2026-06-24T21:30:18.110Z"
 }

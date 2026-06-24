@@ -5,19 +5,19 @@ const launch = { normalizedINR: 69999, normalizedUSD: 804.59, priceType: 'launch
 const current = { normalizedINR: 54999, normalizedUSD: 632.17, priceType: 'current', source: 'current-source', confidence: 0.9 };
 
 describe('price selection', () => {
-  it('prefers launch price over current price', () => {
-    expect(selectPlottedPrice([launch], [current])).toBe(launch);
+  it('prefers current market price over launch price', () => {
+    expect(selectPlottedPrice([launch], [current])).toBe(current);
   });
 
-  it('falls back to current price when launch price is unavailable', () => {
-    expect(selectPlottedPrice([], [current])).toBe(current);
+  it('falls back to launch price when current market price is unavailable', () => {
+    expect(selectPlottedPrice([launch], [])).toBe(launch);
   });
 
   it('uses the highest confidence candidate for the selected price type', () => {
-    const weakLaunch = { ...launch, normalizedINR: 71999, confidence: 0.55 };
-    const strongLaunch = { ...launch, normalizedINR: 69999, confidence: 0.91 };
+    const weakCurrent = { ...current, normalizedINR: 71999, confidence: 0.55 };
+    const strongCurrent = { ...current, normalizedINR: 69999, confidence: 0.91 };
 
-    expect(selectPlottedPrice([weakLaunch, strongLaunch], [current])).toBe(strongLaunch);
+    expect(selectPlottedPrice([launch], [weakCurrent, strongCurrent])).toBe(strongCurrent);
   });
 
   it('accepts candidates with USD normalization when INR normalization is absent', () => {
@@ -28,7 +28,7 @@ describe('price selection', () => {
       confidence: 0.88,
     };
 
-    expect(selectPlottedPrice([usdOnlyLaunch], [current])).toBe(usdOnlyLaunch);
+    expect(selectPlottedPrice([usdOnlyLaunch], [])).toBe(usdOnlyLaunch);
   });
 
   it('does not compare INR and USD amounts as the same unit for tie-breaks', () => {

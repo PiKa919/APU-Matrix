@@ -89,7 +89,8 @@ export default function PhonePricePerformanceChart({ rows = [] }) {
     };
   }, [plottedRows]);
 
-  const currentFallbackCount = plottedRows.filter((row) => row.plottedPrice.priceType === 'current').length;
+  const currentPriceCount = plottedRows.filter((row) => row.plottedPrice.priceType === 'current').length;
+  const launchFallbackCount = plottedRows.filter((row) => row.plottedPrice.priceType === 'launch').length;
   const missingPriceCount = filteredRows.filter((row) => !row.plottedPrice).length;
   const scoreTicks = useMemo(() => makeTicks(bounds.minScore, bounds.maxScore), [bounds]);
   const priceTicks = useMemo(() => makeTicks(bounds.minPrice, bounds.maxPrice), [bounds]);
@@ -126,7 +127,7 @@ export default function PhonePricePerformanceChart({ rows = [] }) {
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-base font-semibold">Phone price performance</h2>
-          <p className="text-xs text-muted-foreground">AnTuTu score vs launch price, with current-price fallback markers</p>
+          <p className="text-xs text-muted-foreground">AnTuTu score vs current market price, with launch-price fallback markers</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -172,7 +173,8 @@ export default function PhonePricePerformanceChart({ rows = [] }) {
 
       <div className="mb-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
         <span>{plottedRows.length} plotted</span>
-        <span>{currentFallbackCount} current fallback</span>
+        <span>{currentPriceCount} current price</span>
+        <span>{launchFallbackCount} launch fallback</span>
         <span>{missingPriceCount} missing price</span>
         {selectedProcessorRows.length > 0 && (
           <span className="text-foreground">

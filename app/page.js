@@ -80,7 +80,7 @@ export default function Dashboard() {
           'div',
           null,
           h('h1', { className: 'text-lg font-semibold' }, 'APU Matrix'),
-          h('p', { className: 'text-xs text-muted-foreground' }, 'Launch-price value analysis')
+          h('p', { className: 'text-xs text-muted-foreground' }, 'Current-price value analysis')
         )
       ),
       h(

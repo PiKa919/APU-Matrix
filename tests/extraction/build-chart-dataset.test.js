@@ -47,14 +47,14 @@ const overrides = [
 ];
 
 describe('chart dataset builder', () => {
-  it('creates plotted rows with launch-first and current-fallback price policy', () => {
+  it('creates plotted rows with current-first and launch-fallback price policy', () => {
     const { rows, report } = buildPhonePricePerformanceDataset({ detailedData, overrides });
 
     expect(rows).toHaveLength(2);
 
     const onePlus = rows.find((row) => row.phoneName === 'OnePlus 15');
-    expect(onePlus.plottedPrice.priceType).toBe('launch');
-    expect(onePlus.plottedPrice.normalizedINR).toBe(54999);
+    expect(onePlus.plottedPrice.priceType).toBe('current');
+    expect(onePlus.plottedPrice.normalizedINR).toBe(49999);
     expect(onePlus.processorBrand).toBe('Snapdragon');
     expect(onePlus.processorSeries).toBe('flagship');
 
@@ -64,8 +64,9 @@ describe('chart dataset builder', () => {
 
     expect(report.totalRows).toBe(2);
     expect(report.plottedRows).toBe(2);
-    expect(report.launchPriceRows).toBe(1);
-    expect(report.currentFallbackRows).toBe(1);
+    expect(report.launchPriceRows).toBe(0);
+    expect(report.currentPriceRows).toBe(2);
+    expect(report.launchFallbackRows).toBe(0);
     expect(report.missingPriceRows).toBe(0);
   });
 
