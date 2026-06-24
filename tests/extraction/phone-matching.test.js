@@ -152,4 +152,21 @@ describe('phone matching', () => {
     expect(razr.candidate.name).toBe('Motorola Razr50 Ultra');
     expect(razr.confidence).toBeGreaterThan(0.75);
   });
+
+  it('does not match XL variants to non-XL models above threshold', () => {
+    expect(bestPhoneMatch(
+      { phoneName: 'Pixel 10 Pro XL', phoneBrand: 'Google', processorName: 'Tensor G6' },
+      [{ name: 'Google Pixel 10 Pro', brand: 'Google', processorName: 'Tensor G6' }]
+    )).toBeNull();
+  });
+
+  it('matches phones when connectivity suffixes are omitted in one source', () => {
+    const result = bestPhoneMatch(
+      { phoneName: 'Moto G Power 5G', phoneBrand: 'Motorola', processorName: 'Snapdragon 7s Gen 2' },
+      [{ name: 'Motorola Moto G Power', brand: 'Motorola', processorName: 'Snapdragon 7s Gen 2' }]
+    );
+
+    expect(result.candidate.name).toBe('Motorola Moto G Power');
+    expect(result.confidence).toBeGreaterThan(0.75);
+  });
 });

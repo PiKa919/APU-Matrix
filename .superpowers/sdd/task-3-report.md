@@ -103,3 +103,18 @@ Changes:
 Verification:
 - RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the two new review regressions.
 - GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 18 tests passed.
+
+## Controller Fix: XL Variants And Connectivity Suffixes
+
+Applied after the fourth Task 3 review found:
+- `XL` variants could match non-XL models such as `Pixel 10 Pro XL` / `Pixel 10 Pro`.
+- Connectivity suffixes such as `5G` could be folded into compact aliases before stop-word filtering.
+
+Changes:
+- Added regression tests for `XL` / non-XL mismatch and omitted connectivity suffix matching.
+- Added `xl` to guarded model variant tokens.
+- Prevented compact alias generation from absorbing `4G` / `5G` suffixes.
+
+Verification:
+- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the two new review regressions.
+- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 20 tests passed.
