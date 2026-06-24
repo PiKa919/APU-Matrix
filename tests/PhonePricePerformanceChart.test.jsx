@@ -79,4 +79,17 @@ describe('PhonePricePerformanceChart', () => {
     fireEvent.click(screen.getByRole('button', { name: 'MediaTek' }));
     expect(screen.getByText('0 plotted')).toBeInTheDocument();
   });
+
+  it('connects visible phones with the same processor after clicking a dot', () => {
+    const { container } = render(<PhonePricePerformanceChart rows={rows} />);
+
+    fireEvent.click(screen.getByTitle(/OnePlus 15/));
+
+    expect(screen.getByText('Snapdragon 8 Elite Gen 5 · 2 phones selected')).toBeInTheDocument();
+
+    const processorLine = container.querySelector('[data-testid="selected-processor-line"]');
+    expect(processorLine).toBeInTheDocument();
+    expect(processorLine).toHaveAttribute('stroke-dasharray', '6 6');
+    expect(processorLine).toHaveAttribute('points', '8,92 92,8');
+  });
 });
