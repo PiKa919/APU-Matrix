@@ -38,3 +38,37 @@ Addressed the remaining normalization findings:
 - Result: passed, 1 file / 4 tests.
 - `npm test`
 - Result: still fails in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`
+
+## Third Fix Cycle
+
+Addressed the remaining Task 2 reviewer findings without widening the normalization rules:
+
+- Canonicalized glued repo-real Snapdragon family/model strings by inserting the family separator only when `Snapdragon` is immediately followed by a digit.
+- Canonicalized glued repo-real Dimensity family/model strings by inserting the family separator only when `Dimensity` is immediately followed by a digit.
+- Canonicalized uppercase raw Tensor names from Chinese-prefixed inputs by mapping leading `TENSOR` to canonical `Tensor`.
+- Treated bare canonical family names like `Tensor` as valid generation values instead of falling through to `Other`.
+- Added regression coverage for the six exact reviewer cases:
+  - `Snapdragon8 Elite Gen 5`
+  - `Snapdragon7+ Gen 3`
+  - `Dimensity9000+`
+  - `Dimensity8100-Max`
+  - `谷歌 TENSOR G3`
+  - `谷歌 TENSOR`
+
+## Spot Check
+
+Direct module spot-check after implementation using `node --input-type=module`:
+
+- `Snapdragon8 Elite Gen 5` -> name `Snapdragon 8 Elite Gen 5`; brand `Snapdragon`; series `flagship`; generation `8 Elite Gen 5`
+- `Snapdragon7+ Gen 3` -> name `Snapdragon 7+ Gen 3`; brand `Snapdragon`; series `premium`; generation `7+ Gen 3`
+- `Dimensity9000+` -> name `Dimensity 9000+`; brand `MediaTek`; series `flagship`; generation `Dimensity 9000`
+- `Dimensity8100-Max` -> name `Dimensity 8100-Max`; brand `MediaTek`; series `premium`; generation `Dimensity 8100`
+- `谷歌 TENSOR G3` -> name `Tensor G3`; brand `Tensor`; series `flagship`; generation `Tensor G3`
+- `谷歌 TENSOR` -> name `Tensor`; brand `Tensor`; series `flagship`; generation `Tensor`
+
+## Verification
+
+- `npm test -- tests/extraction/processor-normalization.test.js`
+- Result: passed, 1 file / 5 tests.
+- `npm test`
+- Result: still fails in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`

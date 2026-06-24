@@ -30,6 +30,50 @@ describe('processor normalization', () => {
     expect(normalizeProcessorName('紫光展锐 T820')).toBe('Unisoc T820');
   });
 
+  it('canonicalizes glued repo-real Snapdragon, Dimensity, and uppercase Tensor inputs', () => {
+    expect(getProcessorMetadata('Snapdragon8 Elite Gen 5')).toEqual({
+      processorName: 'Snapdragon 8 Elite Gen 5',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'flagship',
+      processorGeneration: '8 Elite Gen 5',
+    });
+
+    expect(getProcessorMetadata('Snapdragon7+ Gen 3')).toEqual({
+      processorName: 'Snapdragon 7+ Gen 3',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'premium',
+      processorGeneration: '7+ Gen 3',
+    });
+
+    expect(getProcessorMetadata('Dimensity9000+')).toEqual({
+      processorName: 'Dimensity 9000+',
+      processorBrand: 'MediaTek',
+      processorSeries: 'flagship',
+      processorGeneration: 'Dimensity 9000',
+    });
+
+    expect(getProcessorMetadata('Dimensity8100-Max')).toEqual({
+      processorName: 'Dimensity 8100-Max',
+      processorBrand: 'MediaTek',
+      processorSeries: 'premium',
+      processorGeneration: 'Dimensity 8100',
+    });
+
+    expect(getProcessorMetadata('谷歌 TENSOR G3')).toEqual({
+      processorName: 'Tensor G3',
+      processorBrand: 'Tensor',
+      processorSeries: 'flagship',
+      processorGeneration: 'Tensor G3',
+    });
+
+    expect(getProcessorMetadata('谷歌 TENSOR')).toEqual({
+      processorName: 'Tensor',
+      processorBrand: 'Tensor',
+      processorSeries: 'flagship',
+      processorGeneration: 'Tensor',
+    });
+  });
+
   it('returns processor metadata for chart filters', () => {
     expect(getProcessorMetadata('Snapdragon 8 Gen 3')).toEqual({
       processorName: 'Snapdragon 8 Gen 3',
