@@ -214,3 +214,16 @@ Changes:
 Verification:
 - `npm test -- tests/extraction/processor-normalization.test.js` passed, 1 file and 9 tests passed.
 - Direct Node spot-check confirmed Exynos 1380 and Exynos 1280 are `mid`, Exynos 1480 and Exynos 1580 remain `premium`, and Exynos 990/9825/9820 remain `flagship`. The spot-check emitted the existing MODULE_TYPELESS_PACKAGE_JSON warning.
+
+## Controller Fix: Dimensity 720 And Snapdragon 855 Plus
+
+Applied after review found Dimensity 720 fell to `other` and Snapdragon 855 Plus did not canonicalize to the repo's `Snapdragon 855+` form.
+
+Changes:
+- Added canonical-name override for Snapdragon 855 Plus / Snapdragon 855+.
+- Added series and generation overrides for Dimensity 720.
+- Added regression tests for these exact corpus cases.
+
+Verification:
+- `npm test -- tests/extraction/processor-normalization.test.js` passed, 1 file and 9 tests passed.
+- Direct Node spot-check confirmed Dimensity 720 is `entry` with generation `Dimensity 720`, and `高通 骁龙855 Plus`, `Snapdragon 855 Plus`, and `Snapdragon 855+` all normalize to `Snapdragon 855+` with generation `855+`. The spot-check emitted the existing MODULE_TYPELESS_PACKAGE_JSON warning.

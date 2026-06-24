@@ -9,6 +9,9 @@ describe('processor normalization', () => {
     expect(normalizeProcessorName('高通 骁龙778G Plus')).toBe('Snapdragon 778G+');
     expect(normalizeProcessorName('Snapdragon 778G Plus')).toBe('Snapdragon 778G+');
     expect(normalizeProcessorName('Snapdragon 778G+')).toBe('Snapdragon 778G+');
+    expect(normalizeProcessorName('高通 骁龙855 Plus')).toBe('Snapdragon 855+');
+    expect(normalizeProcessorName('Snapdragon 855 Plus')).toBe('Snapdragon 855+');
+    expect(normalizeProcessorName('Snapdragon 855+')).toBe('Snapdragon 855+');
   });
 
   it('normalizes MediaTek aliases', () => {
@@ -283,6 +286,13 @@ describe('processor normalization', () => {
       processorGeneration: 'Dimensity 800',
     });
 
+    expect(getProcessorMetadata('Dimensity 720')).toEqual({
+      processorName: 'Dimensity 720',
+      processorBrand: 'MediaTek',
+      processorSeries: 'entry',
+      processorGeneration: 'Dimensity 720',
+    });
+
     expect(getProcessorMetadata('Dimensity 900')).toEqual({
       processorName: 'Dimensity 900',
       processorBrand: 'MediaTek',
@@ -311,6 +321,13 @@ describe('processor normalization', () => {
       processorBrand: 'Snapdragon',
       processorSeries: 'flagship',
       processorGeneration: '865',
+    });
+
+    expect(getProcessorMetadata('Snapdragon 855 Plus')).toEqual({
+      processorName: 'Snapdragon 855+',
+      processorBrand: 'Snapdragon',
+      processorSeries: 'flagship',
+      processorGeneration: '855+',
     });
 
     expect(getProcessorMetadata('Snapdragon 782G')).toEqual({
