@@ -188,3 +188,17 @@ Direct module spot-check using `node --input-type=module` for the exact reviewed
 - Result: all exact reviewed cases resolved to the expected canonical name, series, and generation values.
 - `npm test`
 - Result: still fails in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx" from "tests/Dashboard.test.jsx". Does the file exist?`
+
+## Controller Fix: Dimensity 1xxx Taxonomy
+
+Applied after the final Task 2 review found that legacy Dimensity 1xxx chips were still classified by an overly broad numeric fallback.
+
+Changes:
+- Added explicit series overrides for Dimensity 1300, 1200, 1200 Ultra, 1000+, 1000L, 1000C, 1100, 1080, and 1050.
+- Added generation overrides for Dimensity 1200 Ultra and Dimensity 1000L/1000C.
+- Added regression expectations for the exact reviewed cases while preserving Dimensity 800U as mid.
+
+Verification:
+- RED before implementation: `npm test -- tests/extraction/processor-normalization.test.js` failed because `Dimensity 1300` returned `processorSeries: "mid"` instead of `"flagship"`.
+- GREEN after implementation: `npm test -- tests/extraction/processor-normalization.test.js` passed, 1 file and 8 tests passed.
+- Direct Node spot-check confirmed Dimensity 1300, 1200, 1200 Ultra, 1000+, 1000L, 1000C, 1100, 1080, 1050, and 800U resolve to the expected metadata. The spot-check emitted the existing MODULE_TYPELESS_PACKAGE_JSON warning.

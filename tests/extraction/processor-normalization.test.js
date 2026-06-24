@@ -192,11 +192,67 @@ describe('processor normalization', () => {
   });
 
   it('keeps legacy Dimensity generations distinct across harvested 3-digit models', () => {
+    expect(getProcessorMetadata('Dimensity 1300')).toEqual({
+      processorName: 'Dimensity 1300',
+      processorBrand: 'MediaTek',
+      processorSeries: 'flagship',
+      processorGeneration: 'Dimensity 1300',
+    });
+
+    expect(getProcessorMetadata('Dimensity 1200')).toEqual({
+      processorName: 'Dimensity 1200',
+      processorBrand: 'MediaTek',
+      processorSeries: 'flagship',
+      processorGeneration: 'Dimensity 1200',
+    });
+
+    expect(getProcessorMetadata('Dimensity 1200 Ultra')).toEqual({
+      processorName: 'Dimensity 1200 Ultra',
+      processorBrand: 'MediaTek',
+      processorSeries: 'flagship',
+      processorGeneration: 'Dimensity 1200',
+    });
+
     expect(getProcessorMetadata('Dimensity 1000+')).toEqual({
       processorName: 'Dimensity 1000+',
       processorBrand: 'MediaTek',
       processorSeries: 'flagship',
       processorGeneration: 'Dimensity 1000',
+    });
+
+    expect(getProcessorMetadata('Dimensity 1000L')).toEqual({
+      processorName: 'Dimensity 1000L',
+      processorBrand: 'MediaTek',
+      processorSeries: 'flagship',
+      processorGeneration: 'Dimensity 1000',
+    });
+
+    expect(getProcessorMetadata('Dimensity 1000C')).toEqual({
+      processorName: 'Dimensity 1000C',
+      processorBrand: 'MediaTek',
+      processorSeries: 'flagship',
+      processorGeneration: 'Dimensity 1000',
+    });
+
+    expect(getProcessorMetadata('Dimensity 1100')).toEqual({
+      processorName: 'Dimensity 1100',
+      processorBrand: 'MediaTek',
+      processorSeries: 'premium',
+      processorGeneration: 'Dimensity 1100',
+    });
+
+    expect(getProcessorMetadata('Dimensity 1080')).toEqual({
+      processorName: 'Dimensity 1080',
+      processorBrand: 'MediaTek',
+      processorSeries: 'premium',
+      processorGeneration: 'Dimensity 1080',
+    });
+
+    expect(getProcessorMetadata('Dimensity 1050')).toEqual({
+      processorName: 'Dimensity 1050',
+      processorBrand: 'MediaTek',
+      processorSeries: 'premium',
+      processorGeneration: 'Dimensity 1050',
     });
 
     expect(getProcessorMetadata('Dimensity 920')).toEqual({
