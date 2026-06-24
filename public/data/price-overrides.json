@@ -1,0 +1,56 @@
+[
+  {
+    "phoneName": "OnePlus 15",
+    "phoneBrand": "OnePlus",
+    "processorName": "Snapdragon 8 Elite Gen 5",
+    "releaseDate": "2025-10-27",
+    "launchPrices": [
+      {
+        "amount": 54999,
+        "currency": "INR",
+        "rawValue": "INR 54,999",
+        "confidence": 0.95
+      },
+      {
+        "amount": 649,
+        "currency": "USD",
+        "rawValue": "USD 649",
+        "confidence": 0.85
+      }
+    ],
+    "currentPrices": [],
+    "source": "manual-seed"
+  },
+  {
+    "phoneName": "Poco F8 Ultra",
+    "phoneBrand": "POCO",
+    "processorName": "Snapdragon 8 Elite Gen 5",
+    "releaseDate": "2025-11-26",
+    "launchPrices": [
+      {
+        "amount": 840,
+        "currency": "USD",
+        "rawValue": "USD 840",
+        "confidence": 0.85
+      }
+    ],
+    "currentPrices": [],
+    "source": "manual-seed"
+  },
+  {
+    "phoneName": "Samsung Galaxy S26 Ultra",
+    "phoneBrand": "Samsung",
+    "processorName": "Snapdragon 8 Elite Gen 5",
+    "releaseDate": "2026-03-06",
+    "launchPrices": [
+      {
+        "amount": 116990,
+        "currency": "INR",
+        "rawValue": "INR 116,990",
+        "confidence": 0.9
+      }
+    ],
+    "currentPrices": [],
+    "source": "manual-seed"
+  }
+]

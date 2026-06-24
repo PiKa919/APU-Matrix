@@ -2,6 +2,7 @@
   "name": "plasma-astro",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,6 +10,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "data:build-phone-performance": "node scripts/build-phone-price-performance.mjs",
     "report:completeness": "node --env-file=.env scripts/report-data-completeness.mjs",
     "backfill:gsmarena": "node --env-file=.env scripts/backfill-gsmarena.mjs"
   },

@@ -1,0 +1,24 @@
+{
+  "totalRows": 315,
+  "plottedRows": 48,
+  "launchPriceRows": 4,
+  "currentFallbackRows": 44,
+  "missingPriceRows": 267,
+  "processorBrands": {
+    "Exynos": 11,
+    "Kirin": 10,
+    "MediaTek": 110,
+    "Other": 13,
+    "Snapdragon": 164,
+    "Tensor": 5,
+    "Unisoc": 2
+  },
+  "processorSeries": {
+    "entry": 20,
+    "flagship": 168,
+    "mid": 55,
+    "other": 13,
+    "premium": 59
+  },
+  "generatedAt": "2026-06-24T19:43:48.174Z"
+}
