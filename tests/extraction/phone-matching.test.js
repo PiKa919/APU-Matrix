@@ -118,4 +118,38 @@ describe('phone matching', () => {
     expect(result.candidate.name).toBe('Samsung Galaxy S24 Fan Edition');
     expect(result.confidence).toBeGreaterThan(0.75);
   });
+
+  it('does not match different subseries with the same number above threshold', () => {
+    expect(bestPhoneMatch(
+      { phoneName: 'Redmi Note 13 Pro', phoneBrand: 'Redmi', processorName: 'Snapdragon 7s Gen 2' },
+      [{ name: 'Xiaomi Redmi 13 Pro', brand: 'Xiaomi', processorName: 'Snapdragon 7s Gen 2' }]
+    )).toBeNull();
+
+    expect(bestPhoneMatch(
+      { phoneName: 'Redmi Note 13', phoneBrand: 'Redmi', processorName: 'MediaTek Dimensity 6080' },
+      [{ name: 'Xiaomi Redmi 13', brand: 'Xiaomi', processorName: 'MediaTek Dimensity 6080' }]
+    )).toBeNull();
+  });
+
+  it('matches longer compact and spaced model aliases', () => {
+    const realme = bestPhoneMatch(
+      { phoneName: 'Realme GT Neo 6 SE', phoneBrand: 'Realme', processorName: 'Snapdragon 7+ Gen 3' },
+      [{ name: 'Realme GT Neo6 SE', brand: 'Realme', processorName: 'Snapdragon 7+ Gen 3' }]
+    );
+    const fold = bestPhoneMatch(
+      { phoneName: 'Galaxy Z Fold 7', phoneBrand: 'Samsung', processorName: 'Snapdragon 8 Elite' },
+      [{ name: 'Samsung Galaxy ZFold7', brand: 'Samsung', processorName: 'Snapdragon 8 Elite' }]
+    );
+    const razr = bestPhoneMatch(
+      { phoneName: 'Razr 50 Ultra', phoneBrand: 'Motorola', processorName: 'Snapdragon 8s Gen 3' },
+      [{ name: 'Motorola Razr50 Ultra', brand: 'Motorola', processorName: 'Snapdragon 8s Gen 3' }]
+    );
+
+    expect(realme.candidate.name).toBe('Realme GT Neo6 SE');
+    expect(realme.confidence).toBeGreaterThan(0.75);
+    expect(fold.candidate.name).toBe('Samsung Galaxy ZFold7');
+    expect(fold.confidence).toBeGreaterThan(0.75);
+    expect(razr.candidate.name).toBe('Motorola Razr50 Ultra');
+    expect(razr.confidence).toBeGreaterThan(0.75);
+  });
 });

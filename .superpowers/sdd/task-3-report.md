@@ -86,3 +86,20 @@ Changes:
 Verification:
 - RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the three new review regressions.
 - GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 16 tests passed.
+
+## Controller Fix: Subseries And Longer Compact Alias Matching
+
+Applied after the third Task 3 review found:
+- Same-number subseries false positives such as `Redmi Note 13` / `Redmi 13`.
+- Longer compact/spaced false negatives such as `GT Neo 6` / `GT Neo6`, `Z Fold 7` / `ZFold7`, and `Razr 50` / `Razr50`.
+
+Changes:
+- Added regression tests for Redmi subseries mismatches and longer compact/spaced aliases.
+- Added known-brand token handling to keep shared-number brand/subseries context meaningful.
+- Added broader compact model alias normalization for multi-token model families.
+- Added series-context compatibility so shared model numbers alone cannot pass matching.
+- Preserved `One Plus` / `OnePlus` spelling compatibility after early compaction.
+
+Verification:
+- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the two new review regressions.
+- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 18 tests passed.
