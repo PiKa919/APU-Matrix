@@ -56,3 +56,16 @@ Changes:
 Verification:
 - RED before implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` failed with the two expected regressions.
 - GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 11 tests passed.
+
+## Controller Fix: Broader Phone Variant Compatibility
+
+Applied after re-review found phone matching could still attach prices across distinct base/Ultra/Max variants and adjacent model generations. The same review also noted that the Plus guard broke spaced `One Plus` brand spellings.
+
+Changes:
+- Added regression tests for base-to-Ultra, Pro-to-Pro-Max, adjacent generation, and spaced `One Plus` brand matching.
+- Normalized known spaced brand prefixes before variant comparison.
+- Replaced the single Plus guard with variant-signature and numeric-model compatibility checks.
+
+Verification:
+- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the new overmatch and `One Plus` cases.
+- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 13 tests passed.

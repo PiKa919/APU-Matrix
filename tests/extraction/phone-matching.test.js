@@ -53,4 +53,31 @@ describe('phone matching', () => {
 
     expect(result).toBeNull();
   });
+
+  it('does not match base, ultra, max, or adjacent generation variants above threshold', () => {
+    expect(bestPhoneMatch(
+      { phoneName: 'Galaxy S26', phoneBrand: 'Samsung', processorName: 'Exynos 2600' },
+      [{ name: 'Samsung Galaxy S26 Ultra', brand: 'Samsung', processorName: 'Exynos 2600' }]
+    )).toBeNull();
+
+    expect(bestPhoneMatch(
+      { phoneName: 'iPhone 16 Pro', phoneBrand: 'Apple', processorName: 'A18 Pro' },
+      [{ name: 'Apple iPhone 16 Pro Max', brand: 'Apple', processorName: 'A18 Pro' }]
+    )).toBeNull();
+
+    expect(bestPhoneMatch(
+      { phoneName: 'Galaxy S26 Ultra', phoneBrand: 'Samsung', processorName: 'Snapdragon 8 Elite Gen 5' },
+      [{ name: 'Samsung Galaxy S25 Ultra', brand: 'Samsung', processorName: 'Snapdragon 8 Elite Gen 5' }]
+    )).toBeNull();
+  });
+
+  it('matches spaced One Plus brand spelling to OnePlus', () => {
+    const result = bestPhoneMatch(
+      { phoneName: 'OnePlus 15', phoneBrand: 'OnePlus', processorName: 'Snapdragon 8 Elite Gen 5' },
+      [{ name: 'One Plus 15', brand: 'One Plus', processorName: 'Snapdragon 8 Elite Gen 5' }]
+    );
+
+    expect(result.candidate.name).toBe('One Plus 15');
+    expect(result.confidence).toBeGreaterThan(0.9);
+  });
 });
