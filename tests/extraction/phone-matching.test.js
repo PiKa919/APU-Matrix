@@ -191,4 +191,11 @@ describe('phone matching', () => {
     expect(galaxy.candidate.name).toBe('Samsung Galaxy S24FE');
     expect(galaxy.confidence).toBeGreaterThan(0.75);
   });
+
+  it('does not treat the OnePlus brand token as a plus variant', () => {
+    expect(bestPhoneMatch(
+      { phoneName: 'OnePlus 15', phoneBrand: 'OnePlus', processorName: 'Snapdragon 8 Elite Gen 5' },
+      [{ name: 'OnePlus 15 Plus', brand: 'OnePlus', processorName: 'Snapdragon 8 Elite Gen 5' }]
+    )).toBeNull();
+  });
 });

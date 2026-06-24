@@ -133,3 +133,14 @@ Changes:
 Verification:
 - RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the new compact suffix regression.
 - GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 21 tests passed.
+
+## Controller Self-Review Cleanup: OnePlus Brand Variant Guard
+
+Applied after local final review found compact variant splitting could treat the `oneplus` brand token as a Plus variant.
+
+Changes:
+- Added a regression test for `OnePlus 15` not matching `OnePlus 15 Plus`.
+- Skipped compact variant suffix splitting for known brand tokens.
+
+Verification:
+- `npm test -- tests/extraction/currency.test.js tests/extraction/processor-normalization.test.js tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 4 files and 36 tests passed.
