@@ -6,7 +6,25 @@ describe('currency extraction', () => {
     expect(parseCurrencyValue('₹69,999')).toEqual({ amount: 69999, currency: 'INR', rawValue: '₹69,999' })
     expect(parseCurrencyValue('$840')).toEqual({ amount: 840, currency: 'USD', rawValue: '$840' })
     expect(parseCurrencyValue('CNY 4,999')).toEqual({ amount: 4999, currency: 'CNY', rawValue: 'CNY 4,999' })
+    expect(parseCurrencyValue('RMB 4,999')).toEqual({ amount: 4999, currency: 'CNY', rawValue: 'RMB 4,999' })
+    expect(parseCurrencyValue('CN¥4,999')).toEqual({ amount: 4999, currency: 'CNY', rawValue: 'CN¥4,999' })
     expect(parseCurrencyValue('€799')).toEqual({ amount: 799, currency: 'EUR', rawValue: '€799' })
+  })
+
+  it('treats bare yen prices as JPY', () => {
+    expect(parseCurrencyValue('¥129,800')).toEqual({ amount: 129800, currency: 'JPY', rawValue: '¥129,800' })
+
+    const price = normalizePrice('¥129,800', 'fixture', 'current')
+
+    expect(price).toMatchObject({
+      amount: 129800,
+      currency: 'JPY',
+      normalizedINR: 77880,
+      normalizedUSD: 895.17,
+      source: 'fixture',
+      rawValue: '¥129,800',
+      priceType: 'current',
+    })
   })
 
   it('normalizes supported currencies to INR and USD', () => {

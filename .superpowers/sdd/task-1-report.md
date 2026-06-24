@@ -23,3 +23,25 @@ Implemented the first extraction utility layer for phone price normalization in 
 ## Commit
 
 - Created: `3b70f0c`
+
+---
+
+# Task 1 Fix Report Update
+
+## What Was Fixed
+
+- Changed currency parsing so bare `¥` is treated as `JPY` instead of `CNY`.
+- Kept `CNY`, `RMB`, and `CN¥` mapped to `CNY`.
+- Updated the checked-in Vitest config so ordinary test runs include `tests/**/*.test.js` as well as `tests/**/*.test.jsx`.
+- Added regression coverage for `¥129,800` and the CNY aliases.
+
+## Verification
+
+- `npm test -- tests/extraction/currency.test.js`
+- Result: passed, 1 file / 5 tests.
+- `npm test`
+- Result: failed in unrelated `tests/Dashboard.test.jsx` with `Failed to resolve import "../app/page.jsx"` because that file does not exist in the workspace.
+
+## Commit
+
+- Created: `1cebcd7`
