@@ -118,3 +118,18 @@ Changes:
 Verification:
 - RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the two new review regressions.
 - GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 20 tests passed.
+
+## Controller Fix: Compact Variant Suffix Aliases
+
+Applied after the fifth Task 3 review found compact variant suffix false negatives:
+- `Pixel 10 Pro XL` / `Pixel 10 ProXL`
+- `iPhone 16 Pro Max` / `iPhone 16 ProMax`
+- `Galaxy S24 FE` / `Galaxy S24FE`
+
+Changes:
+- Added regression tests for compact `ProXL`, `ProMax`, and `S24FE` aliases.
+- Split compact variant suffixes during matcher tokenization so compatibility checks see the same variant signature.
+
+Verification:
+- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the new compact suffix regression.
+- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 21 tests passed.

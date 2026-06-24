@@ -169,4 +169,26 @@ describe('phone matching', () => {
     expect(result.candidate.name).toBe('Motorola Moto G Power');
     expect(result.confidence).toBeGreaterThan(0.75);
   });
+
+  it('matches compact variant suffix aliases', () => {
+    const pixel = bestPhoneMatch(
+      { phoneName: 'Pixel 10 Pro XL', phoneBrand: 'Google', processorName: 'Tensor G6' },
+      [{ name: 'Google Pixel 10 ProXL', brand: 'Google', processorName: 'Tensor G6' }]
+    );
+    const iphone = bestPhoneMatch(
+      { phoneName: 'iPhone 16 Pro Max', phoneBrand: 'Apple', processorName: 'A18 Pro' },
+      [{ name: 'Apple iPhone 16 ProMax', brand: 'Apple', processorName: 'A18 Pro' }]
+    );
+    const galaxy = bestPhoneMatch(
+      { phoneName: 'Galaxy S24 FE', phoneBrand: 'Samsung', processorName: 'Exynos 2400e' },
+      [{ name: 'Samsung Galaxy S24FE', brand: 'Samsung', processorName: 'Exynos 2400e' }]
+    );
+
+    expect(pixel.candidate.name).toBe('Google Pixel 10 ProXL');
+    expect(pixel.confidence).toBeGreaterThan(0.75);
+    expect(iphone.candidate.name).toBe('Apple iPhone 16 ProMax');
+    expect(iphone.confidence).toBeGreaterThan(0.75);
+    expect(galaxy.candidate.name).toBe('Samsung Galaxy S24FE');
+    expect(galaxy.confidence).toBeGreaterThan(0.75);
+  });
 });
