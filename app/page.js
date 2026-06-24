@@ -8,6 +8,17 @@ import { Button } from '@/components/ui/button';
 
 const h = React.createElement;
 
+async function requestRows() {
+  const response = await fetch('/api/devices');
+  const json = await response.json();
+
+  if (!json.success) {
+    throw new Error(json.error || 'Failed to fetch devices');
+  }
+
+  return json.data;
+}
+
 export default function Dashboard() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,14 +29,7 @@ export default function Dashboard() {
     setError(null);
 
     try {
-      const response = await fetch('/api/devices');
-      const json = await response.json();
-
-      if (!json.success) {
-        throw new Error(json.error || 'Failed to fetch devices');
-      }
-
-      setRows(json.data);
+      setRows(await requestRows());
     } catch (fetchError) {
       setError(fetchError.message);
     } finally {
@@ -34,7 +38,28 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    fetchData();
+    let active = true;
+
+    requestRows()
+      .then((data) => {
+        if (active) {
+          setRows(data);
+        }
+      })
+      .catch((fetchError) => {
+        if (active) {
+          setError(fetchError.message);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return h(
