@@ -54,6 +54,15 @@ describe('PhonePricePerformanceChart', () => {
     expect(screen.getByLabelText('phone price performance scatter plot')).toBeInTheDocument();
   });
 
+  it('renders x and y axis value ticks', () => {
+    render(<PhonePricePerformanceChart rows={rows} />);
+
+    expect(screen.getByText('3.6M')).toBeInTheDocument();
+    expect(screen.getByText('4.0M')).toBeInTheDocument();
+    expect(screen.getByText('INR 55K')).toBeInTheDocument();
+    expect(screen.getByText('INR 65K')).toBeInTheDocument();
+  });
+
   it('uses browser-supported point positions', () => {
     render(<PhonePricePerformanceChart rows={rows} />);
 

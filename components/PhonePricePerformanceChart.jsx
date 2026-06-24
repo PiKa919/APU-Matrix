@@ -35,6 +35,19 @@ function plotPosition(percent) {
   return `${8 + (Math.max(0, Math.min(100, percent)) * 0.84)}%`;
 }
 
+function makeTicks(min, max, count = 5) {
+  if (count <= 1 || !Number.isFinite(min) || !Number.isFinite(max)) {
+    return [min || 0];
+  }
+
+  if (min === max) {
+    return [min];
+  }
+
+  const step = (max - min) / (count - 1);
+  return Array.from({ length: count }, (_, index) => Math.round(min + (step * index)));
+}
+
 function uniqueSorted(values) {
   return [...new Set(values.filter(Boolean))].sort();
 }
@@ -52,18 +65,29 @@ export default function PhonePricePerformanceChart({ rows = [] }) {
   }, [filteredRows]);
 
   const bounds = useMemo(() => {
+    if (plottedRows.length === 0) {
+      return {
+        minScore: 0,
+        maxScore: 1,
+        minPrice: 0,
+        maxPrice: 1,
+      };
+    }
+
     const scores = plottedRows.map((row) => row.antutuScore);
     const prices = plottedRows.map((row) => row.plottedPrice.normalizedINR);
     return {
-      minScore: Math.min(...scores, 0),
-      maxScore: Math.max(...scores, 1),
-      minPrice: Math.min(...prices, 0),
-      maxPrice: Math.max(...prices, 1),
+      minScore: Math.min(...scores),
+      maxScore: Math.max(...scores),
+      minPrice: Math.min(...prices),
+      maxPrice: Math.max(...prices),
     };
   }, [plottedRows]);
 
   const currentFallbackCount = plottedRows.filter((row) => row.plottedPrice.priceType === 'current').length;
   const missingPriceCount = filteredRows.filter((row) => !row.plottedPrice).length;
+  const scoreTicks = useMemo(() => makeTicks(bounds.minScore, bounds.maxScore), [bounds]);
+  const priceTicks = useMemo(() => makeTicks(bounds.minPrice, bounds.maxPrice), [bounds]);
 
   return (
     <section className="border border-[#303030] bg-[#171717] p-5 text-foreground">
@@ -120,6 +144,28 @@ export default function PhonePricePerformanceChart({ rows = [] }) {
         className="relative h-[560px] overflow-hidden border border-[#303030] bg-[#1d1d1d]"
       >
         <div className="absolute inset-12 border-l border-b border-[#484848]" />
+        {scoreTicks.map((tick, index) => {
+          const percent = ((tick - bounds.minScore) / (bounds.maxScore - bounds.minScore || 1)) * 100;
+
+          return (
+            <div key={`x-${index}-${tick}`} className="absolute bottom-12 top-12 border-l border-[#363636]" style={{ left: plotPosition(percent) }}>
+              <span className="absolute top-full mt-3 -translate-x-1/2 whitespace-nowrap text-[11px] text-muted-foreground">
+                {formatScore(tick)}
+              </span>
+            </div>
+          );
+        })}
+        {priceTicks.map((tick, index) => {
+          const percent = 100 - ((tick - bounds.minPrice) / (bounds.maxPrice - bounds.minPrice || 1)) * 100;
+
+          return (
+            <div key={`y-${index}-${tick}`} className="absolute left-12 right-12 border-t border-[#363636]" style={{ top: plotPosition(percent) }}>
+              <span className="absolute right-full mr-3 -translate-y-1/2 whitespace-nowrap text-[11px] text-muted-foreground">
+                {formatPrice(tick)}
+              </span>
+            </div>
+          );
+        })}
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-xs text-muted-foreground">AnTuTu score</div>
         <div className="absolute left-3 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-muted-foreground">Phone price</div>
         <div className="absolute bottom-10 right-10 text-xs italic text-muted-foreground">best value</div>
