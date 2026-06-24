@@ -202,3 +202,15 @@ Verification:
 - RED before implementation: `npm test -- tests/extraction/processor-normalization.test.js` failed because `Dimensity 1300` returned `processorSeries: "mid"` instead of `"flagship"`.
 - GREEN after implementation: `npm test -- tests/extraction/processor-normalization.test.js` passed, 1 file and 8 tests passed.
 - Direct Node spot-check confirmed Dimensity 1300, 1200, 1200 Ultra, 1000+, 1000L, 1000C, 1100, 1080, 1050, and 800U resolve to the expected metadata. The spot-check emitted the existing MODULE_TYPELESS_PACKAGE_JSON warning.
+
+## Controller Fix: Exynos 1xxx Mid-Range Exceptions
+
+Applied after review found the broad Exynos 1xxx rule classified harvested Exynos 1380 and Exynos 1280 as premium.
+
+Changes:
+- Added explicit series overrides for Exynos 1380 and Exynos 1280 as `mid`.
+- Added regression tests for both processors.
+
+Verification:
+- `npm test -- tests/extraction/processor-normalization.test.js` passed, 1 file and 9 tests passed.
+- Direct Node spot-check confirmed Exynos 1380 and Exynos 1280 are `mid`, Exynos 1480 and Exynos 1580 remain `premium`, and Exynos 990/9825/9820 remain `flagship`. The spot-check emitted the existing MODULE_TYPELESS_PACKAGE_JSON warning.

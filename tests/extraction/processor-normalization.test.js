@@ -399,4 +399,20 @@ describe('processor normalization', () => {
       processorGeneration: 'Exynos 9820',
     });
   });
+
+  it('classifies harvested mid-range Exynos 1xxx processors with explicit exceptions', () => {
+    expect(getProcessorMetadata('Exynos 1380')).toEqual({
+      processorName: 'Exynos 1380',
+      processorBrand: 'Exynos',
+      processorSeries: 'mid',
+      processorGeneration: 'Exynos 1380',
+    });
+
+    expect(getProcessorMetadata('Exynos 1280')).toEqual({
+      processorName: 'Exynos 1280',
+      processorBrand: 'Exynos',
+      processorSeries: 'mid',
+      processorGeneration: 'Exynos 1280',
+    });
+  });
 });
