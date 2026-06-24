@@ -31,6 +31,10 @@ function project(row, bounds) {
   return { x, y };
 }
 
+function plotPosition(percent) {
+  return `${8 + (Math.max(0, Math.min(100, percent)) * 0.84)}%`;
+}
+
 function uniqueSorted(values) {
   return [...new Set(values.filter(Boolean))].sort();
 }
@@ -129,8 +133,8 @@ export default function PhonePricePerformanceChart({ rows = [] }) {
               key={row.id}
               className="group absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full"
               style={{
-                left: `calc(48px + ${point.x}% * (100% - 96px) / 100)`,
-                top: `calc(48px + ${point.y}% * (100% - 96px) / 100)`,
+                left: plotPosition(point.x),
+                top: plotPosition(point.y),
                 background: color,
                 border: row.plottedPrice.priceType === 'current' ? '2px solid white' : `1px solid ${color}`,
               }}

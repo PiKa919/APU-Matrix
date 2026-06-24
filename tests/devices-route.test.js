@@ -22,4 +22,23 @@ describe('/api/devices', () => {
 
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  it('defaults to phone-like categories for the dashboard view', async () => {
+    const response = await GET(new Request('http://localhost/api/devices'));
+    const json = await response.json();
+    const categories = new Set(json.data.map((row) => row.category));
+
+    expect(categories.has('harvested')).toBe(false);
+    expect(categories.has('android_lite')).toBe(false);
+    expect(json.count).toBeLessThan(json.report.totalRows);
+  });
+
+  it('can include every category for extraction review', async () => {
+    const response = await GET(new Request('http://localhost/api/devices?includeAllCategories=true'));
+    const json = await response.json();
+    const categories = new Set(json.data.map((row) => row.category));
+
+    expect(json.count).toBe(json.report.totalRows);
+    expect(categories.has('harvested')).toBe(true);
+  });
 });

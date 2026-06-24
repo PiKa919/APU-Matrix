@@ -54,6 +54,16 @@ describe('PhonePricePerformanceChart', () => {
     expect(screen.getByLabelText('phone price performance scatter plot')).toBeInTheDocument();
   });
 
+  it('uses browser-supported point positions', () => {
+    render(<PhonePricePerformanceChart rows={rows} />);
+
+    const point = screen.getByTitle(/OnePlus 15/);
+    expect(point.style.left).toMatch(/%$/);
+    expect(point.style.top).toMatch(/%$/);
+    expect(point.style.left).not.toContain('*');
+    expect(point.style.top).not.toContain('*');
+  });
+
   it('filters by processor brand', () => {
     render(<PhonePricePerformanceChart rows={rows} />);
 
