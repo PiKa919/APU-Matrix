@@ -28,7 +28,7 @@ vi.mock('chart.js', () => {
 });
 
 import { render, screen } from '@testing-library/react';
-import Dashboard from '../app/page.jsx';
+import Dashboard from '../app/page.js';
 
 describe('Dashboard', () => {
   beforeEach(() => {
@@ -37,11 +37,30 @@ describe('Dashboard', () => {
         success: true,
         data: [
           {
-            brand: 'Apple',
-            modelName: 'iPhone Test',
-            chipset: 'Apple A18',
-            score: 1500000,
-            price: 50000,
+            id: 'oneplus-15',
+            phoneName: 'OnePlus 15',
+            phoneBrand: 'OnePlus',
+            processorName: 'Snapdragon 8 Elite Gen 5',
+            processorBrand: 'Snapdragon',
+            processorSeries: 'flagship',
+            processorGeneration: '8 Elite Gen 5',
+            antutuScore: 3606895,
+            category: 'android',
+            plottedPrice: { normalizedINR: 54999, normalizedUSD: 632.17, priceType: 'launch', source: 'manual-seed' },
+            missingFields: [],
+          },
+          {
+            id: 'missing',
+            phoneName: 'Missing Price Phone',
+            phoneBrand: 'Example',
+            processorName: 'Dimensity 9500',
+            processorBrand: 'MediaTek',
+            processorSeries: 'flagship',
+            processorGeneration: 'Dimensity 9500',
+            antutuScore: 3000000,
+            category: 'android',
+            plottedPrice: null,
+            missingFields: ['price'],
           },
         ],
       }),
@@ -52,10 +71,10 @@ describe('Dashboard', () => {
     vi.unstubAllGlobals();
   });
 
-  it('renders the main dashboard cards after data loads', async () => {
+  it('renders the price performance chart and missing review table after data loads', async () => {
     render(<Dashboard />);
 
-    expect(await screen.findByText('Performance vs price')).toBeInTheDocument();
-    expect(screen.getByText('SoC ranking')).toBeInTheDocument();
+    expect(await screen.findByText('Phone price performance')).toBeInTheDocument();
+    expect(screen.getByText('Missing price review')).toBeInTheDocument();
   });
 });
