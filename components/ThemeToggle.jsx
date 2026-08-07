@@ -1,19 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
 const STORAGE_KEY = 'apu-matrix-theme';
+const THEME_CHANGE_EVENT = 'apu-matrix-theme-change';
 
-function getInitialTheme() {
-  if (typeof window === 'undefined') return 'dark';
+function getClientTheme() {
   const savedTheme = window.localStorage.getItem(STORAGE_KEY);
   if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+function getServerTheme() {
+  return 'dark';
+}
+
+function subscribe(onStoreChange) {
+  window.addEventListener(THEME_CHANGE_EVENT, onStoreChange);
+  return () => window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
+}
+
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState(getInitialTheme);
+  const theme = useSyncExternalStore(subscribe, getClientTheme, getServerTheme);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -22,7 +31,7 @@ export default function ThemeToggle() {
   function toggleTheme() {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     window.localStorage.setItem(STORAGE_KEY, nextTheme);
-    setTheme(nextTheme);
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }
 
   const isDark = theme === 'dark';

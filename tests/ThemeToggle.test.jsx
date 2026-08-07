@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -63,7 +63,21 @@ describe('ThemeToggle', () => {
   });
 
   it('derives the initial theme without synchronously setting state in an effect', () => {
-    expect(themeToggleSource).toContain('useState(getInitialTheme)');
-    expect(themeToggleSource).not.toContain('setTheme(getInitialTheme())');
+    expect(themeToggleSource).toContain('useSyncExternalStore');
+    expect(themeToggleSource).toContain('getServerTheme');
+    expect(themeToggleSource).toContain("return 'dark';");
+  });
+
+  it('updates from the persisted theme custom event', () => {
+    mockSystemTheme(true);
+    render(<ThemeToggle />);
+
+    window.localStorage.setItem('apu-matrix-theme', 'light');
+    act(() => {
+      window.dispatchEvent(new Event('apu-matrix-theme-change'));
+    });
+
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(screen.getByRole('button', { name: 'Switch to dark theme' })).toBeInTheDocument();
   });
 });
