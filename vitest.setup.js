@@ -4,3 +4,8 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 expect.extend(matchers);
 
 HTMLCanvasElement.prototype.getContext = () => ({});
+
+global.ResizeObserver = class {
+  observe() {}
+  disconnect() {}
+};
