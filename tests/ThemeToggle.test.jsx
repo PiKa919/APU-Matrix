@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const globalStyles = readFileSync(resolve(process.cwd(), 'app/globals.css'), 'utf8');
+const themeToggleSource = readFileSync(resolve(process.cwd(), 'components/ThemeToggle.jsx'), 'utf8');
 
 function mockSystemTheme(matches) {
   vi.stubGlobal('matchMedia', vi.fn().mockImplementation((query) => ({
@@ -59,5 +60,10 @@ describe('ThemeToggle', () => {
 
   it('keeps legacy decorative colors behind semantic theme tokens', () => {
     expect(globalStyles).not.toMatch(/rgba\(47, 183, 166|rgba\(228, 207, 160|rgba\(255, 255, 255|rgba\(245, 245, 241|rgba\(18, 31, 33/);
+  });
+
+  it('derives the initial theme without synchronously setting state in an effect', () => {
+    expect(themeToggleSource).toContain('useState(getInitialTheme)');
+    expect(themeToggleSource).not.toContain('setTheme(getInitialTheme())');
   });
 });
