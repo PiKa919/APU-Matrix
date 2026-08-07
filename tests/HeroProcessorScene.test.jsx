@@ -5,15 +5,17 @@ vi.mock('three', () => {
   const rendererDispose = vi.fn();
   const geometryDispose = vi.fn();
   const materialDispose = vi.fn();
+  let rendererShouldThrow = false;
   let rendererCanvas;
   return {
     rendererDispose,
     geometryDispose,
     materialDispose,
     getRendererCanvas: () => rendererCanvas,
+    setWebGLRendererFailure: (value) => { rendererShouldThrow = value; },
     Scene: class { add() {} },
     PerspectiveCamera: class { constructor() { this.position = { set() {} }; } lookAt() {} updateProjectionMatrix() {} },
-    WebGLRenderer: class { constructor() { this.domElement = document.createElement('canvas'); rendererCanvas = this.domElement; } setPixelRatio() {} setSize() {} render() {} dispose = rendererDispose; },
+    WebGLRenderer: class { constructor() { if (rendererShouldThrow) throw new Error('WebGL is unavailable'); this.domElement = document.createElement('canvas'); rendererCanvas = this.domElement; } setPixelRatio() {} setSize() {} render() {} dispose = rendererDispose; },
     Group: class { constructor() { this.rotation = { x: 0, y: 0 }; } add() {} },
     BoxGeometry: class { dispose = geometryDispose; },
     EdgesGeometry: class { dispose = geometryDispose; },
@@ -31,6 +33,7 @@ import * as THREE from 'three';
 describe('HeroProcessorScene', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    THREE.setWebGLRendererFailure(false);
     vi.clearAllMocks();
   });
 
@@ -68,5 +71,16 @@ describe('HeroProcessorScene', () => {
 
     expect(screen.getByLabelText('Static processor lattice')).toBeInTheDocument();
     expect(window.requestAnimationFrame).not.toHaveBeenCalled();
+  });
+
+  it('keeps a labelled static fallback when WebGL renderer initialization fails', () => {
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }));
+    THREE.setWebGLRendererFailure(true);
+
+    const { container } = render(<HeroProcessorScene />);
+
+    expect(screen.getByRole('img', { name: 'Static processor lattice (WebGL unavailable)' })).toBeInTheDocument();
+    expect(screen.getByText('Static processor lattice')).toBeInTheDocument();
+    expect(container.querySelector('canvas')).toBeNull();
   });
 });

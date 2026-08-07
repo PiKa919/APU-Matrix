@@ -10,10 +10,23 @@ const METRICS = [
   { id: 'antutu', label: 'AnTuTu', color: '#f7ad6a' },
 ];
 
-export default function LeaderboardStage({ id = 'leaderboard' }) {
+function formatSourceStatus({ loading, error, lastUpdated }) {
+  if (error) return `Device data unavailable: ${error}`;
+  if (loading) return 'Collecting current device data…';
+  if (lastUpdated) {
+    return `Current device data updated ${new Intl.DateTimeFormat('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(lastUpdated)}`;
+  }
+  return 'Device data has not been collected yet.';
+}
+
+export default function LeaderboardStage({ id = 'leaderboard', loading = false, error = null, lastUpdated = null }) {
   const [metricId, setMetricId] = useState('cpu');
   const metric = METRICS.find((item) => item.id === metricId) ?? METRICS[0];
   const graphLabel = `${metric.label} benchmark graph awaiting normalized data`;
+  const sourceStatus = formatSourceStatus({ loading, error, lastUpdated });
 
   return (
     <section id={id} className="leaderboard-stage" aria-labelledby="leaderboard-heading">
@@ -23,9 +36,9 @@ export default function LeaderboardStage({ id = 'leaderboard' }) {
           <h2 id="leaderboard-heading">Leaderboard</h2>
           <p>Comparable CPU, GPU, AI, and AnTuTu views will appear after source normalization.</p>
         </div>
-        <div className="stage-source-status" aria-label="Data collection status">
+        <div className="stage-source-status" role="status" aria-live="polite" aria-label="Leaderboard data status">
           <Database aria-hidden="true" size={15} />
-          <span>Current table uses available AnTuTu and price data</span>
+          <span>{sourceStatus}</span>
         </div>
       </div>
 
@@ -55,7 +68,7 @@ export default function LeaderboardStage({ id = 'leaderboard' }) {
         <div className="graph-axis graph-axis-y">Performance score</div>
         <div className="graph-axis graph-axis-x">Normalized benchmark metric</div>
         <div className="graph-reserve-copy">
-          <span className="graph-reserve-eyebrow" style={{ color: metric.color }}>{metric.label} view</span>
+          <span className="graph-reserve-eyebrow">{metric.label} view</span>
           <strong>Awaiting normalized benchmark data</strong>
           <span>Weekly collection and source review are being prepared before ranking devices.</span>
         </div>

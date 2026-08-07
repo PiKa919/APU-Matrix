@@ -10,9 +10,19 @@ export default function HeroProcessorScene() {
     const container = containerRef.current;
     if (!container) return undefined;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let renderer;
+
+    try {
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    } catch {
+      renderer?.dispose();
+      container.dataset.webglFallback = 'true';
+      container.setAttribute('aria-label', 'Static processor lattice (WebGL unavailable)');
+      return undefined;
+    }
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     const lattice = new THREE.Group();
     const resources = [];
     camera.position.set(0, 0, 7);
@@ -68,5 +78,9 @@ export default function HeroProcessorScene() {
   }, []);
 
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  return <div ref={containerRef} className="hero-scene" role="img" aria-label={reducedMotion ? 'Static processor lattice' : 'Animated processor lattice'} />;
+  return (
+    <div ref={containerRef} className="hero-scene" role="img" aria-label={reducedMotion ? 'Static processor lattice' : 'Animated processor lattice'}>
+      <span className="hero-scene-fallback" aria-hidden="true">Static processor lattice</span>
+    </div>
+  );
 }

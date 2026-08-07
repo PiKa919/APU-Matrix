@@ -20,4 +20,30 @@ describe('LeaderboardStage', () => {
     expect(screen.getByRole('button', { name: 'AI' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('img', { name: 'AI benchmark graph awaiting normalized data' })).toBeInTheDocument();
   });
+
+  it('politely announces that current device data is being collected', () => {
+    render(<LeaderboardStage loading error={null} lastUpdated={null} />);
+
+    expect(screen.getByRole('status', { name: 'Leaderboard data status' })).toHaveTextContent('Collecting current device data');
+  });
+
+  it('politely announces when current device data was last updated', () => {
+    render(<LeaderboardStage loading={false} error={null} lastUpdated={new Date('2026-08-08T10:15:00')} />);
+
+    expect(screen.getByRole('status', { name: 'Leaderboard data status' })).toHaveTextContent('Current device data updated');
+  });
+
+  it('announces unavailable data instead of claiming current data after an error', () => {
+    render(<LeaderboardStage loading={false} error="Device data unavailable" lastUpdated={new Date('2026-08-08T10:15:00')} />);
+
+    const status = screen.getByRole('status', { name: 'Leaderboard data status' });
+    expect(status).toHaveTextContent('Device data unavailable');
+    expect(status).not.toHaveTextContent('Current device data');
+  });
+
+  it('uses semantic foreground text for the selected metric eyebrow', () => {
+    render(<LeaderboardStage />);
+
+    expect(screen.getByText('CPU view')).not.toHaveAttribute('style');
+  });
 });

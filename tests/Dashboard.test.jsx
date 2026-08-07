@@ -33,9 +33,10 @@ describe('Dashboard', () => {
 
     expect(screen.getByRole('banner')).toBeInTheDocument();
     expect(screen.getByRole('banner').closest('main')).toBeNull();
-    expect(screen.getByText('Devices')).toHaveAttribute('aria-label', 'Devices coming soon');
+    expect(screen.getByLabelText('Devices coming soon')).toHaveTextContent('Coming soon');
     expect(screen.getByRole('link', { name: 'Explore leaderboard' })).toHaveAttribute('href', '#leaderboard');
     expect(await screen.findByRole('table', { name: 'Current device data' })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Leaderboard data status' })).toHaveTextContent('Current device data updated');
     expect(screen.getByText('OnePlus 15')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Field Notes' })).toBeInTheDocument();
   });
@@ -47,8 +48,10 @@ describe('Dashboard', () => {
     render(<Dashboard />);
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Device data unavailable');
+    expect(screen.getByRole('status', { name: 'Leaderboard data status' })).toHaveTextContent('Device data unavailable');
     fireEvent.click(screen.getByRole('button', { name: 'Refresh data' }));
     expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(await screen.findByRole('table', { name: 'Current device data' })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Leaderboard data status' })).toHaveTextContent('Current device data updated');
   });
 });

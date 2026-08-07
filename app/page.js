@@ -1,6 +1,6 @@
 'use client';
 
-import { createElement as h, useEffect, useState } from 'react';
+import { createElement as h, useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { RefreshCw } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -28,44 +28,37 @@ export default function Dashboard() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  async function fetchData() {
+  const fetchData = useCallback(async (isActive = () => true) => {
     setLoading(true);
     setError(null);
 
     try {
-      setRows(await requestRows());
+      const data = await requestRows();
+      if (isActive()) {
+        setRows(data);
+        setLastUpdated(new Date());
+      }
     } catch (fetchError) {
-      setError(fetchError.message);
+      if (isActive()) {
+        setError(fetchError.message);
+      }
     } finally {
-      setLoading(false);
+      if (isActive()) {
+        setLoading(false);
+      }
     }
-  }
+  }, []);
 
   useEffect(() => {
     let active = true;
-
-    requestRows()
-      .then((data) => {
-        if (active) {
-          setRows(data);
-        }
-      })
-      .catch((fetchError) => {
-        if (active) {
-          setError(fetchError.message);
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
+    fetchData(() => active);
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [fetchData]);
 
   return h(
     'div',
@@ -78,9 +71,9 @@ export default function Dashboard() {
         'nav',
         { 'aria-label': 'Primary navigation' },
         h('a', { href: '#top' }, 'Overview'),
-        h('span', { 'aria-label': 'Devices coming soon' }, 'Devices'),
-        h('span', { 'aria-label': 'Processors coming soon' }, 'Processors'),
-        h('span', { 'aria-label': 'Field Notes coming soon' }, 'Field Notes')
+        h('span', { 'aria-label': 'Devices coming soon' }, 'Devices ', h('span', { className: 'coming-soon-badge', 'aria-hidden': true }, 'Coming soon')),
+        h('span', { 'aria-label': 'Processors coming soon' }, 'Processors ', h('span', { className: 'coming-soon-badge', 'aria-hidden': true }, 'Coming soon')),
+        h('span', { 'aria-label': 'Field Notes coming soon' }, 'Field Notes ', h('span', { className: 'coming-soon-badge', 'aria-hidden': true }, 'Coming soon'))
       ),
       h(
         'div',
@@ -88,7 +81,7 @@ export default function Dashboard() {
         h(ThemeToggle),
         h(
           'button',
-          { type: 'button', className: 'refresh-button', onClick: fetchData, disabled: loading, 'aria-label': 'Refresh data' },
+          { type: 'button', className: 'refresh-button', onClick: () => fetchData(), disabled: loading, 'aria-label': 'Refresh data' },
           h(RefreshCw, { 'aria-hidden': true, size: 15, className: loading ? 'spin' : '' }),
           h('span', null, loading ? 'Refreshing' : 'Refresh')
         )
@@ -110,7 +103,7 @@ export default function Dashboard() {
         ),
         h(HeroProcessorScene)
       ),
-      h(LeaderboardStage, { id: 'leaderboard' }),
+      h(LeaderboardStage, { id: 'leaderboard', loading, error, lastUpdated }),
       h(
         'section',
         { className: 'insight-strip', 'aria-label': 'How future benchmark views are read' },
