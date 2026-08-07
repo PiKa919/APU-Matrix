@@ -4,33 +4,56 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --background: #f5f5f1;
-  --foreground: #1c2326;
-  --card: #ffffff;
-  --card-foreground: #1c2326;
-  --popover: #ffffff;
-  --popover-foreground: #1c2326;
-  --primary: #2fb7a6;
-  --primary-foreground: #0f1a19;
-  --secondary: #e9ece7;
-  --secondary-foreground: #1c2326;
-  --muted: #eef1ed;
-  --muted-foreground: #6a747a;
-  --accent: #57c5b8;
-  --accent-foreground: #0f1a19;
-  --destructive: #d64b4b;
-  --destructive-foreground: #ffffff;
-  --border: rgba(22, 33, 36, 0.12);
-  --input: rgba(22, 33, 36, 0.12);
-  --ring: rgba(47, 183, 166, 0.35);
-  --radius: 0.75rem;
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --background: #0a0b0d;
+  --surface: #111317;
+  --surface-raised: #171a1f;
+  --foreground: #f4f7f9;
+  --muted-foreground: #9aa5ae;
+  --border: #2b3138;
+  --accent: #72d7f6;
+  --accent-strong: #28add7;
+  --accent-foreground: #071116;
+  --danger: #ef767a;
+  --grid-line: rgb(148 163 184 / 0.14);
+  --radius: 0.5rem;
+}
 
-  /* Custom matrix variables */
-  --accent-dim: rgba(47, 183, 166, 0.4);
-  --panel-bg: rgba(255, 255, 255, 0.8);
-  --panel-border: rgba(22, 33, 36, 0.1);
-  --panel-glow: rgba(47, 183, 166, 0.12);
+:root[data-theme='light'] {
+  color-scheme: light;
+  --background: #f5f7f8;
+  --surface: #ffffff;
+  --surface-raised: #edf1f3;
+  --foreground: #11181d;
+  --muted-foreground: #5d6a73;
+  --border: #cfd8de;
+  --accent: #087fa7;
+  --accent-strong: #056887;
+  --accent-foreground: #ffffff;
+  --danger: #b4232c;
+  --grid-line: rgb(50 65 75 / 0.13);
+}
+
+:root {
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  --secondary: var(--surface-raised);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--surface-raised);
+  --destructive: var(--danger);
+  --destructive-foreground: var(--accent-foreground);
+  --input: var(--border);
+  --ring: var(--accent);
+  --accent-dim: color-mix(in srgb, var(--accent) 40%, transparent);
+  --panel-bg: color-mix(in srgb, var(--surface) 80%, transparent);
+  --panel-border: color-mix(in srgb, var(--border) 80%, transparent);
+  --panel-glow: color-mix(in srgb, var(--accent) 12%, transparent);
   --sidebar-width: 260px;
 }
 
@@ -54,6 +77,30 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), 'Space Grotesk', system-ui, sans-serif;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 @layer base {
