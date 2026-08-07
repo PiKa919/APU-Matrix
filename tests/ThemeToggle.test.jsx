@@ -62,6 +62,10 @@ describe('ThemeToggle', () => {
     expect(globalStyles).not.toMatch(/rgba\(47, 183, 166|rgba\(228, 207, 160|rgba\(255, 255, 255|rgba\(245, 245, 241|rgba\(18, 31, 33/);
   });
 
+  it('does not layer a fixed body decoration over the application', () => {
+    expect(globalStyles).not.toMatch(/body::before\s*\{/);
+  });
+
   it('derives the initial theme without synchronously setting state in an effect', () => {
     expect(themeToggleSource).toContain('useSyncExternalStore');
     expect(themeToggleSource).toContain('getServerTheme');

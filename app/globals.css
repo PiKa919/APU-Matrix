@@ -115,18 +115,6 @@ a:focus-visible {
   }
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 50% at 15% 20%, color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 85% 80%, color-mix(in srgb, var(--surface-raised) 18%, transparent) 0%, transparent 65%),
-    linear-gradient(120deg, color-mix(in srgb, var(--surface) 85%, transparent), color-mix(in srgb, var(--background) 75%, transparent));
-  pointer-events: none;
-  z-index: 0;
-}
-
 /* ─── Header ─────────────────────────────────────────────────────────── */
 .hero-scene {
   min-height: 18rem;
