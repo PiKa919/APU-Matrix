@@ -1,12 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Cpu, RefreshCw } from 'lucide-react';
-import PhonePricePerformanceChart from '@/components/PhonePricePerformanceChart';
-import MissingPriceTable from '@/components/MissingPriceTable';
-import { Button } from '@/components/ui/button';
+import { createElement as h, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { RefreshCw } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
+import LeaderboardStage from '@/components/LeaderboardStage';
+import DeviceSnapshotTable from '@/components/DeviceSnapshotTable';
+import FieldNotesPreview from '@/components/FieldNotesPreview';
 
-const h = React.createElement;
+const HeroProcessorScene = dynamic(() => import('@/components/HeroProcessorScene'), {
+  ssr: false,
+  loading: () => h('div', { className: 'hero-scene', 'aria-label': 'Processor lattice loading', role: 'img' }),
+});
 
 async function requestRows() {
   const response = await fetch('/api/devices');
@@ -64,51 +69,57 @@ export default function Dashboard() {
 
   return h(
     'main',
-    { className: 'min-h-screen bg-[#121212] text-foreground' },
+    { className: 'site-shell' },
     h(
       'header',
-      { className: 'flex h-16 items-center justify-between border-b border-[#282828] px-6' },
+      { className: 'topbar', role: 'banner' },
+      h('a', { className: 'wordmark', href: '#top', 'aria-label': 'APU Matrix overview' }, 'APU Matrix'),
       h(
-        'div',
-        { className: 'flex items-center gap-3' },
-        h(
-          'div',
-          { className: 'flex h-9 w-9 items-center justify-center bg-primary text-primary-foreground' },
-          h(Cpu, { size: 18 })
-        ),
-        h(
-          'div',
-          null,
-          h('h1', { className: 'text-lg font-semibold' }, 'APU Matrix'),
-          h('p', { className: 'text-xs text-muted-foreground' }, 'Current-price value analysis')
-        )
+        'nav',
+        { 'aria-label': 'Primary navigation' },
+        h('a', { href: '#top' }, 'Overview'),
+        h('span', { 'aria-label': 'Devices coming soon' }, 'Devices'),
+        h('span', { 'aria-label': 'Processors coming soon' }, 'Processors'),
+        h('span', { 'aria-label': 'Field Notes coming soon' }, 'Field Notes')
       ),
       h(
-        Button,
-        { variant: 'outline', size: 'sm', onClick: fetchData, disabled: loading },
-        h(RefreshCw, { className: loading ? 'mr-2 h-4 w-4 animate-spin' : 'mr-2 h-4 w-4' }),
-        'Refresh'
+        'div',
+        { className: 'topbar-actions' },
+        h(ThemeToggle),
+        h(
+          'button',
+          { type: 'button', className: 'refresh-button', onClick: fetchData, disabled: loading, 'aria-label': 'Refresh data' },
+          h(RefreshCw, { 'aria-hidden': true, size: 15, className: loading ? 'spin' : '' }),
+          h('span', null, loading ? 'Refreshing' : 'Refresh')
+        )
       )
     ),
     h(
       'div',
-      { className: 'space-y-6 p-6' },
-      loading && h(
-        'div',
-        { className: 'flex h-[420px] items-center justify-center border border-[#303030] bg-[#171717] text-sm text-muted-foreground' },
-        'Preparing phone price data...'
+      { id: 'top', className: 'page-content' },
+      h(
+        'section',
+        { className: 'hero', 'aria-labelledby': 'hero-heading' },
+        h(
+          'div',
+          { className: 'hero-copy' },
+          h('span', { className: 'section-kicker' }, 'Phone performance research'),
+          h('h1', { id: 'hero-heading' }, 'Benchmark context, not just a score.'),
+          h('p', null, 'APU Matrix brings device performance, processor context, and pricing into one readable research surface.'),
+          h('a', { className: 'hero-cta', href: '#leaderboard' }, 'Explore leaderboard')
+        ),
+        h(HeroProcessorScene)
       ),
-      error && h(
-        'div',
-        { className: 'border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200' },
-        error
+      h(LeaderboardStage, { id: 'leaderboard' }),
+      h(
+        'section',
+        { className: 'insight-strip', 'aria-label': 'How future benchmark views are read' },
+        h('article', null, h('h2', null, 'CPU'), h('p', null, 'App responsiveness and sustained general compute.')),
+        h('article', null, h('h2', null, 'GPU'), h('p', null, 'Gaming and graphics workloads under comparable tests.')),
+        h('article', null, h('h2', null, 'AI'), h('p', null, 'On-device model throughput with the backend identified.'))
       ),
-      !loading && !error && h(
-        React.Fragment,
-        null,
-        h(PhonePricePerformanceChart, { rows }),
-        h(MissingPriceTable, { rows })
-      )
+      h(DeviceSnapshotTable, { rows, loading, error }),
+      h(FieldNotesPreview)
     )
   );
 }

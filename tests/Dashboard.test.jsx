@@ -1,80 +1,53 @@
-import { vi } from 'vitest';
-
-vi.mock('chart.js', () => {
-  class MockChart {
-    static register = vi.fn();
-    static lastConfig = null;
-
-    constructor(ctx, config) {
-      MockChart.lastConfig = config;
-    }
-
-    destroy() {}
-  }
-
-  return {
-    Chart: MockChart,
-    ScatterController: {},
-    LineController: {},
-    LineElement: {},
-    PointElement: {},
-    LinearScale: {},
-    Tooltip: {},
-    Legend: {},
-    BarController: {},
-    BarElement: {},
-    CategoryScale: {},
-  };
-});
-
-import { render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import Dashboard from '../app/page.js';
+
+vi.mock('@/components/HeroProcessorScene', () => ({
+  default: () => <div aria-label="Animated processor lattice" role="img" />,
+}));
+
+const data = [{
+  id: 'oneplus-15',
+  phoneName: 'OnePlus 15',
+  processorName: 'Snapdragon 8 Elite Gen 5',
+  antutuScore: 3606895,
+  plottedPrice: { normalizedINR: 54999, priceType: 'current' },
+}];
 
 describe('Dashboard', () => {
   beforeEach(() => {
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      json: () => Promise.resolve({
-        success: true,
-        data: [
-          {
-            id: 'oneplus-15',
-            phoneName: 'OnePlus 15',
-            phoneBrand: 'OnePlus',
-            processorName: 'Snapdragon 8 Elite Gen 5',
-            processorBrand: 'Snapdragon',
-            processorSeries: 'flagship',
-            processorGeneration: '8 Elite Gen 5',
-            antutuScore: 3606895,
-            category: 'android',
-            plottedPrice: { normalizedINR: 54999, normalizedUSD: 632.17, priceType: 'launch', source: 'manual-seed' },
-            missingFields: [],
-          },
-          {
-            id: 'missing',
-            phoneName: 'Missing Price Phone',
-            phoneBrand: 'Example',
-            processorName: 'Dimensity 9500',
-            processorBrand: 'MediaTek',
-            processorSeries: 'flagship',
-            processorGeneration: 'Dimensity 9500',
-            antutuScore: 3000000,
-            category: 'android',
-            plottedPrice: null,
-            missingFields: ['price'],
-          },
-        ],
-      }),
+      json: () => Promise.resolve({ success: true, data }),
     }));
   });
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+  afterEach(() => vi.unstubAllGlobals());
 
-  it('renders the price performance chart and missing review table after data loads', async () => {
+  it('composes the research homepage around the API-backed device table', async () => {
     render(<Dashboard />);
 
-    expect(await screen.findByText('Phone price performance')).toBeInTheDocument();
-    expect(screen.getByText('Missing price review')).toBeInTheDocument();
+    expect(screen.getByRole('banner')).toBeInTheDocument();
+    expect(screen.getByText('Devices')).toHaveAttribute('aria-label', 'Devices coming soon');
+    expect(screen.getByRole('link', { name: 'Explore leaderboard' })).toHaveAttribute('href', '#leaderboard');
+    expect(await screen.findByRole('table', { name: 'Current device data' })).toBeInTheDocument();
+    expect(screen.getByText('OnePlus 15')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Field Notes' })).toBeInTheDocument();
+  });
+
+  it('shows a useful error state when the device request fails and lets readers retry', async () => {
+    global.fetch.mockResolvedValueOnce({
+      json: () => Promise.resolve({ success: false, error: 'Device data unavailable' }),
+    });
+    render(<Dashboard />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Device data unavailable');
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh data' }));
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(await screen.findByRole('table', { name: 'Current device data' })).toBeInTheDocument();
   });
 });
