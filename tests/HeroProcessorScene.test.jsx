@@ -2,17 +2,21 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 vi.mock('three', () => {
-  const dispose = vi.fn();
+  const rendererDispose = vi.fn();
+  const geometryDispose = vi.fn();
+  const materialDispose = vi.fn();
   return {
-    rendererDispose: dispose,
+    rendererDispose,
+    geometryDispose,
+    materialDispose,
     Scene: class { add() {} },
     PerspectiveCamera: class { constructor() { this.position = { set() {} }; } lookAt() {} updateProjectionMatrix() {} },
-    WebGLRenderer: class { constructor() { this.domElement = document.createElement('canvas'); } setPixelRatio() {} setSize() {} render() {} dispose = dispose; },
+    WebGLRenderer: class { constructor() { this.domElement = document.createElement('canvas'); } setPixelRatio() {} setSize() {} render() {} dispose = rendererDispose; },
     Group: class { constructor() { this.rotation = { x: 0, y: 0 }; } add() {} },
-    BoxGeometry: class { dispose = dispose; },
-    EdgesGeometry: class { dispose = dispose; },
-    MeshBasicMaterial: class { dispose = dispose; },
-    LineBasicMaterial: class { dispose = dispose; },
+    BoxGeometry: class { dispose = geometryDispose; },
+    EdgesGeometry: class { dispose = geometryDispose; },
+    MeshBasicMaterial: class { dispose = materialDispose; },
+    LineBasicMaterial: class { dispose = materialDispose; },
     Mesh: class { constructor() { this.position = { set() {} }; } },
     LineSegments: class { constructor() {} },
     Color: class { constructor() {} },
@@ -23,18 +27,33 @@ import HeroProcessorScene from '@/components/HeroProcessorScene';
 import * as THREE from 'three';
 
 describe('HeroProcessorScene', () => {
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
+  });
 
-  it('renders an accessible canvas region and disposes the renderer on unmount', () => {
+  it('disposes every scene resource and removes the canvas on unmount', () => {
     vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }));
-    vi.stubGlobal('requestAnimationFrame', vi.fn().mockReturnValue(1));
+    vi.stubGlobal('requestAnimationFrame', vi.fn().mockReturnValue(0));
     vi.stubGlobal('cancelAnimationFrame', vi.fn());
-    const { unmount } = render(<HeroProcessorScene />);
+    const observerDisconnect = vi.fn();
+    vi.stubGlobal('ResizeObserver', class {
+      observe() {}
+      disconnect = observerDisconnect;
+    });
+    const { container, unmount } = render(<HeroProcessorScene />);
+    const canvas = container.querySelector('canvas');
 
     expect(screen.getByLabelText('Animated processor lattice')).toBeInTheDocument();
+    expect(canvas).toBeInTheDocument();
     unmount();
+
     expect(THREE.rendererDispose).toHaveBeenCalled();
-    expect(window.cancelAnimationFrame).toHaveBeenCalledWith(1);
+    expect(THREE.geometryDispose).toHaveBeenCalledTimes(9);
+    expect(THREE.materialDispose).toHaveBeenCalledTimes(9);
+    expect(observerDisconnect).toHaveBeenCalledTimes(1);
+    expect(window.cancelAnimationFrame).toHaveBeenCalledWith(0);
+    expect(canvas.parentElement).toBeNull();
   });
 
   it('renders the same scene without scheduling animation for reduced motion', () => {

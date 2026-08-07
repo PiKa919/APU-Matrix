@@ -59,7 +59,7 @@ export default function HeroProcessorScene() {
     observer.observe(container);
 
     return () => {
-      if (frameId) window.cancelAnimationFrame(frameId);
+      if (frameId !== undefined) window.cancelAnimationFrame(frameId);
       observer.disconnect();
       resources.forEach((resource) => resource.dispose());
       renderer.dispose();
