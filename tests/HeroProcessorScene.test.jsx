@@ -5,13 +5,15 @@ vi.mock('three', () => {
   const rendererDispose = vi.fn();
   const geometryDispose = vi.fn();
   const materialDispose = vi.fn();
+  let rendererCanvas;
   return {
     rendererDispose,
     geometryDispose,
     materialDispose,
+    getRendererCanvas: () => rendererCanvas,
     Scene: class { add() {} },
     PerspectiveCamera: class { constructor() { this.position = { set() {} }; } lookAt() {} updateProjectionMatrix() {} },
-    WebGLRenderer: class { constructor() { this.domElement = document.createElement('canvas'); } setPixelRatio() {} setSize() {} render() {} dispose = rendererDispose; },
+    WebGLRenderer: class { constructor() { this.domElement = document.createElement('canvas'); rendererCanvas = this.domElement; } setPixelRatio() {} setSize() {} render() {} dispose = rendererDispose; },
     Group: class { constructor() { this.rotation = { x: 0, y: 0 }; } add() {} },
     BoxGeometry: class { dispose = geometryDispose; },
     EdgesGeometry: class { dispose = geometryDispose; },
@@ -43,6 +45,8 @@ describe('HeroProcessorScene', () => {
     });
     const { container, unmount } = render(<HeroProcessorScene />);
     const canvas = container.querySelector('canvas');
+    const rendererCanvas = THREE.getRendererCanvas();
+    const removeCanvas = vi.spyOn(rendererCanvas, 'remove');
 
     expect(screen.getByLabelText('Animated processor lattice')).toBeInTheDocument();
     expect(canvas).toBeInTheDocument();
@@ -53,6 +57,7 @@ describe('HeroProcessorScene', () => {
     expect(THREE.materialDispose).toHaveBeenCalledTimes(9);
     expect(observerDisconnect).toHaveBeenCalledTimes(1);
     expect(window.cancelAnimationFrame).toHaveBeenCalledWith(0);
+    expect(removeCanvas).toHaveBeenCalledTimes(1);
     expect(canvas.parentElement).toBeNull();
   });
 
