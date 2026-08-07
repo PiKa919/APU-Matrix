@@ -68,7 +68,7 @@ export default function Dashboard() {
   }, []);
 
   return h(
-    'main',
+    'div',
     { className: 'site-shell' },
     h(
       'header',
@@ -95,7 +95,7 @@ export default function Dashboard() {
       )
     ),
     h(
-      'div',
+      'main',
       { id: 'top', className: 'page-content' },
       h(
         'section',

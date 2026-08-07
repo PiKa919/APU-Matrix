@@ -32,6 +32,7 @@ describe('Dashboard', () => {
     render(<Dashboard />);
 
     expect(screen.getByRole('banner')).toBeInTheDocument();
+    expect(screen.getByRole('banner').closest('main')).toBeNull();
     expect(screen.getByText('Devices')).toHaveAttribute('aria-label', 'Devices coming soon');
     expect(screen.getByRole('link', { name: 'Explore leaderboard' })).toHaveAttribute('href', '#leaderboard');
     expect(await screen.findByRole('table', { name: 'Current device data' })).toBeInTheDocument();
