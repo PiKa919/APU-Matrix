@@ -1,24 +1,49 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import LeaderboardStage from '@/components/LeaderboardStage';
 
+vi.mock('chart.js', () => {
+  class MockChart { static register = vi.fn(); constructor() {} destroy() {} }
+  return { Chart: MockChart, LinearScale: {}, LineController: {}, LineElement: {}, PointElement: {}, ScatterController: {}, Tooltip: {} };
+});
+
 describe('LeaderboardStage', () => {
-  it('starts on CPU and clearly identifies the graph reserve as awaiting data', () => {
-    render(<LeaderboardStage id="leaderboard" />);
+  const benchmarkData = {
+    metrics: {
+      cpu: {
+        label: 'Geekbench 6 multi-core',
+        points: [{ id: 's25', phoneName: 'Galaxy S25', phoneBrand: 'Samsung', deviceFamily: 'Galaxy S', x: 9200, priceInr: 79999, details: {}, series: [] }],
+        series: [],
+      },
+      gpu: { label: '3DMark Wild Life Extreme score', points: [], series: [] },
+      ai: { label: 'Geekbench AI quantized score', points: [], series: [] },
+      antutu: { label: 'AnTuTu score', points: [], series: [] },
+    },
+  };
+
+  it('starts on CPU and renders the API-backed graph', () => {
+    render(<LeaderboardStage id="leaderboard" benchmarkData={benchmarkData} />);
 
     expect(screen.getByRole('button', { name: 'CPU' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('img', { name: 'CPU benchmark graph awaiting normalized data' })).toBeInTheDocument();
-    expect(screen.getByText('Awaiting normalized benchmark data')).toBeInTheDocument();
+    expect(screen.getByLabelText('CPU price versus performance chart')).toBeInTheDocument();
+    expect(screen.getByText('Galaxy S25')).toBeInTheDocument();
     expect(screen.getByText('Device filter: upcoming')).toBeInTheDocument();
-    expect(screen.queryByTestId('benchmark-point')).not.toBeInTheDocument();
   });
 
-  it('updates the graph reserve label when a metric is selected', () => {
-    render(<LeaderboardStage />);
+  it('updates the graph when a metric is selected', () => {
+    render(<LeaderboardStage benchmarkData={benchmarkData} />);
     fireEvent.click(screen.getByRole('button', { name: 'AI' }));
 
     expect(screen.getByRole('button', { name: 'AI' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('img', { name: 'AI benchmark graph awaiting normalized data' })).toBeInTheDocument();
+    expect(screen.getByText('Geekbench AI quantized score data is not available yet.')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Geekbench AI quantized score price versus performance chart')).not.toBeInTheDocument();
+  });
+
+  it('renders the GPU empty state from live benchmark data', () => {
+    render(<LeaderboardStage benchmarkData={benchmarkData} />);
+    fireEvent.click(screen.getByRole('button', { name: 'GPU' }));
+
+    expect(screen.getByText('3DMark data is not available yet.')).toBeInTheDocument();
   });
 
   it('politely announces that current device data is being collected', () => {
@@ -41,9 +66,9 @@ describe('LeaderboardStage', () => {
     expect(status).not.toHaveTextContent('Current device data');
   });
 
-  it('uses semantic foreground text for the selected metric eyebrow', () => {
+  it('shows a neutral empty state before benchmark data is available', () => {
     render(<LeaderboardStage />);
 
-    expect(screen.getByText('CPU view')).not.toHaveAttribute('style');
+    expect(screen.getByText('Benchmark data has not been collected yet.')).toBeInTheDocument();
   });
 });

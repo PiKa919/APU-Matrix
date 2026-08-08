@@ -24,11 +24,21 @@ async function requestRows() {
   return json.data;
 }
 
+async function requestBenchmarks() {
+  const response = await fetch('/api/benchmarks');
+  const json = await response.json();
+  if (!json.success) throw new Error(json.error || 'Failed to fetch benchmark data');
+  return json.data;
+}
+
 export default function Dashboard() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [benchmarkData, setBenchmarkData] = useState(null);
+  const [benchmarkLoading, setBenchmarkLoading] = useState(true);
+  const [benchmarkError, setBenchmarkError] = useState(null);
 
   const fetchData = useCallback(async (isActive = () => true) => {
     setLoading(true);
@@ -51,14 +61,28 @@ export default function Dashboard() {
     }
   }, []);
 
+  const fetchBenchmarks = useCallback(async (isActive = () => true) => {
+    setBenchmarkLoading(true);
+    setBenchmarkError(null);
+    try {
+      const data = await requestBenchmarks();
+      if (isActive()) setBenchmarkData(data);
+    } catch (fetchError) {
+      if (isActive()) setBenchmarkError(fetchError.message);
+    } finally {
+      if (isActive()) setBenchmarkLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let active = true;
     fetchData(() => active);
+    fetchBenchmarks(() => active);
 
     return () => {
       active = false;
     };
-  }, [fetchData]);
+  }, [fetchData, fetchBenchmarks]);
 
   return h(
     'div',
@@ -81,7 +105,7 @@ export default function Dashboard() {
         h(ThemeToggle),
         h(
           'button',
-          { type: 'button', className: 'refresh-button', onClick: () => fetchData(), disabled: loading, 'aria-label': 'Refresh data' },
+          { type: 'button', className: 'refresh-button', onClick: () => { fetchData(); fetchBenchmarks(); }, disabled: loading || benchmarkLoading, 'aria-label': 'Refresh data' },
           h(RefreshCw, { 'aria-hidden': true, size: 15, className: loading ? 'spin' : '' }),
           h('span', null, loading ? 'Refreshing' : 'Refresh')
         )
@@ -103,7 +127,7 @@ export default function Dashboard() {
         ),
         h(HeroProcessorScene)
       ),
-      h(LeaderboardStage, { id: 'leaderboard', loading, error, lastUpdated }),
+      h(LeaderboardStage, { id: 'leaderboard', loading, error, lastUpdated, benchmarkData, benchmarkLoading, benchmarkError }),
       h(
         'section',
         { className: 'insight-strip', 'aria-label': 'How future benchmark views are read' },

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Database, SlidersHorizontal } from 'lucide-react';
+import BenchmarkScatterPlot from '@/components/BenchmarkScatterPlot';
 
 const METRICS = [
   { id: 'cpu', label: 'CPU', color: '#72d7f6' },
@@ -22,11 +23,13 @@ function formatSourceStatus({ loading, error, lastUpdated }) {
   return 'Device data has not been collected yet.';
 }
 
-export default function LeaderboardStage({ id = 'leaderboard', loading = false, error = null, lastUpdated = null }) {
+export default function LeaderboardStage({ id = 'leaderboard', loading = false, error = null, lastUpdated = null, benchmarkData = null, benchmarkLoading = false, benchmarkError = null }) {
   const [metricId, setMetricId] = useState('cpu');
   const metric = METRICS.find((item) => item.id === metricId) ?? METRICS[0];
-  const graphLabel = `${metric.label} benchmark graph awaiting normalized data`;
   const sourceStatus = formatSourceStatus({ loading, error, lastUpdated });
+  const selectedMetric = benchmarkData?.metrics?.[metric.id]
+    ? { ...benchmarkData.metrics[metric.id], chartLabel: metric.label }
+    : null;
 
   return (
     <section id={id} className="leaderboard-stage" aria-labelledby="leaderboard-heading">
@@ -34,7 +37,7 @@ export default function LeaderboardStage({ id = 'leaderboard', loading = false, 
       <div className="stage-heading-row">
         <div>
           <h2 id="leaderboard-heading">Leaderboard</h2>
-          <p>Comparable CPU, GPU, AI, and AnTuTu views will appear after source normalization.</p>
+          <p>Compare real benchmark scores and current prices across device families.</p>
         </div>
         <div className="stage-source-status" role="status" aria-live="polite" aria-label="Leaderboard data status">
           <Database aria-hidden="true" size={15} />
@@ -64,18 +67,10 @@ export default function LeaderboardStage({ id = 'leaderboard', loading = false, 
         </div>
       </div>
 
-      <div className="graph-reserve" role="img" aria-label={graphLabel}>
-        <div className="graph-axis graph-axis-y">Performance score</div>
-        <div className="graph-axis graph-axis-x">Normalized benchmark metric</div>
-        <div className="graph-reserve-copy">
-          <span className="graph-reserve-eyebrow">{metric.label} view</span>
-          <strong>Awaiting normalized benchmark data</strong>
-          <span>Weekly collection and source review are being prepared before ranking devices.</span>
-        </div>
-        <div className="graph-legend" aria-label="Future metric color legend">
-          {METRICS.map((item) => <span key={item.id}><i style={{ background: item.color }} />{item.label}</span>)}
-        </div>
-      </div>
+      {benchmarkLoading && <div className="graph-empty-state">Loading benchmark data…</div>}
+      {!benchmarkLoading && benchmarkError && <div className="graph-empty-state">Benchmark data unavailable: {benchmarkError}</div>}
+      {!benchmarkLoading && !benchmarkError && selectedMetric && <BenchmarkScatterPlot metric={selectedMetric} />}
+      {!benchmarkLoading && !benchmarkError && !selectedMetric && <div className="graph-empty-state">Benchmark data has not been collected yet.</div>}
     </section>
   );
 }
