@@ -52,6 +52,7 @@ describe('BenchmarkScatterPlot', () => {
     expect(screen.getByRole('table', { name: 'Benchmark points' })).toBeInTheDocument();
     expect(ChartJS.lastConfig.data.datasets[0].pointBackgroundColor({ raw: cpuMetric.points[0] })).toBe('#60a5fa');
     expect(ChartJS.lastConfig.data.datasets[1].label).toBe('Samsung / Galaxy S');
+    expect(ChartJS.lastConfig.data.datasets[1].borderColor).toBe('#60a5fa');
     expect(ChartJS.lastConfig.data.datasets[0].data[0]).toEqual(expect.objectContaining({ x: 9200, y: 79999 }));
     expect(ChartJS.lastConfig.data.datasets[1].data).toEqual([
       { x: 9200, y: 79999 },

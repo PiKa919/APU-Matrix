@@ -81,7 +81,7 @@ function toChartData(metric) {
   metric.series.forEach((series) => datasets.push({
     type: 'line', label: series.id.replace(':', ' / '), parsing: false,
     data: series.points.map((point) => ({ x: point.x, y: point.priceInr })),
-    borderColor: 'rgba(148, 163, 184, 0.48)', borderWidth: 1.5, pointRadius: 0, tension: 0,
+    borderColor: brandColor(series.id.split(':')[0]), borderWidth: 1.5, pointRadius: 0, tension: 0,
   }));
   return { datasets };
 }
