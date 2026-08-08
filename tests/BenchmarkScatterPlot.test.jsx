@@ -74,6 +74,23 @@ describe('BenchmarkScatterPlot', () => {
     expect(dark.options.plugins['benchmark-chart-background'].color).not.toBe(light.options.plugins['benchmark-chart-background'].color);
   });
 
+  it('renders direct phone labels through the chart drawing plugin', () => {
+    render(<BenchmarkScatterPlot metric={cpuMetric} />);
+
+    expect(ChartJS.lastConfig.plugins.some((plugin) => plugin.id === 'benchmark-point-labels')).toBe(true);
+    expect(ChartJS.lastConfig.data.datasets[0].data[0].phoneName).toBe('Galaxy S25');
+  });
+
+  it('keeps connecting series lines quieter than benchmark dots', () => {
+    const metricWithSeries = {
+      ...cpuMetric,
+      series: [{ id: 'Samsung:Galaxy S', points: [cpuMetric.points[0], { ...cpuMetric.points[0], id: 's24', phoneName: 'Galaxy S24', x: 7800, priceInr: 59999 }] }],
+    };
+    render(<BenchmarkScatterPlot metric={metricWithSeries} />);
+
+    expect(ChartJS.lastConfig.data.datasets[1].borderWidth).toBeLessThan(ChartJS.lastConfig.data.datasets[0].pointRadius);
+  });
+
   it('explains an unavailable GPU metric without a fabricated chart', () => {
     render(<BenchmarkScatterPlot metric={gpuMetric} />);
 

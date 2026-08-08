@@ -22,6 +22,44 @@ const chartBackgroundPlugin = {
     chart.ctx.restore();
   },
 };
+const benchmarkPointLabelsPlugin = {
+  id: 'benchmark-point-labels',
+  afterDatasetsDraw(chart, _args, options = {}) {
+    const dataset = chart.data.datasets[0];
+    const meta = chart.getDatasetMeta(0);
+    if (!dataset || !meta?.data?.length) return;
+
+    const ctx = chart.ctx;
+    const chartArea = chart.chartArea;
+    ctx.save();
+    ctx.textBaseline = 'middle';
+    ctx.font = '600 12px system-ui, -apple-system, sans-serif';
+    ctx.shadowColor = options.shadowColor || 'transparent';
+    ctx.shadowBlur = 4;
+
+    dataset.data.forEach((point, index) => {
+      const position = meta.data[index]?.getProps(['x', 'y'], true);
+      if (!position) return;
+
+      const label = point.phoneName || 'Unknown device';
+      const secondary = `${point.phoneBrand || 'Unknown'} · ${formatPrice(point.priceInr)}`;
+      const labelWidth = ctx.measureText(label).width;
+      const placeLeft = position.x + 9 + labelWidth > chartArea.right;
+      const labelX = placeLeft ? position.x - 9 : position.x + 9;
+      const verticalOffset = index % 2 === 0 ? -10 : 10;
+
+      ctx.textAlign = placeLeft ? 'right' : 'left';
+      ctx.fillStyle = brandColor(point.phoneBrand);
+      ctx.fillText(label, labelX, position.y + verticalOffset);
+      ctx.font = '500 10px system-ui, -apple-system, sans-serif';
+      ctx.globalAlpha = 0.68;
+      ctx.fillText(secondary, labelX, position.y + verticalOffset + (verticalOffset < 0 ? 14 : -14));
+      ctx.globalAlpha = 1;
+    });
+
+    ctx.restore();
+  },
+};
 
 function brandColor(brand) { return BRAND_COLORS[brand] || DEFAULT_COLOR; }
 function formatPrice(value) { return typeof value === 'number' ? `₹${value.toLocaleString('en-IN')}` : 'N/A'; }
@@ -58,13 +96,13 @@ export default function BenchmarkScatterPlot({ metric, theme = 'dark' }) {
     if (!metric.points.length || !canvasRef.current) return undefined;
     chartRef.current?.destroy();
     chartRef.current = new ChartJS(canvasRef.current.getContext('2d'), {
-      type: 'scatter', data: toChartData(metric), plugins: [chartBackgroundPlugin], options: {
+      type: 'scatter', data: toChartData(metric), plugins: [chartBackgroundPlugin, benchmarkPointLabelsPlugin], options: {
         responsive: true, maintainAspectRatio: false,
         scales: {
           x: { title: { display: true, text: metric.xLabel || metric.label, color: chartTheme.text }, ticks: { color: chartTheme.text }, grid: { color: chartTheme.grid } },
           y: { title: { display: true, text: 'Price (INR)', color: chartTheme.text }, ticks: { color: chartTheme.text }, grid: { color: chartTheme.grid } },
         },
-        plugins: { legend: { display: false }, 'benchmark-chart-background': { color: chartTheme.background }, tooltip: {
+        plugins: { legend: { display: false }, 'benchmark-chart-background': { color: chartTheme.background }, 'benchmark-point-labels': { shadowColor: chartTheme.background }, tooltip: {
           backgroundColor: chartTheme.tooltipBackground, borderColor: chartTheme.tooltipBorder, borderWidth: 1,
           titleColor: chartTheme.text, bodyColor: chartTheme.text,
           callbacks: {
