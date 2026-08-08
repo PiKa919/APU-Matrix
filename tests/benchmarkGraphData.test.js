@@ -35,6 +35,15 @@ describe('buildBenchmarkGraphData', () => {
     expect(buildBenchmarkGraphData(csvFixture).metrics.gpu.points).toEqual([]);
   });
 
+  it('provides a display label for every metric returned to the chart', () => {
+    const metrics = buildBenchmarkGraphData(csvFixture).metrics;
+
+    expect(metrics.cpu.label).toBe('Geekbench 6 multi-core');
+    expect(metrics.ai.label).toBe('Geekbench AI quantized score');
+    expect(metrics.antutu.label).toBe('AnTuTu score');
+    expect(metrics.gpu.label).toBe('3DMark Wild Life Extreme score');
+  });
+
   it('uses the most recently observed row when benchmark completeness ties', () => {
     const csv = `id,phone_name,phone_brand,release_year,canonical_model,y_price_inr,cpu_geekbench6_multi_core,cpu_observed_at,cpu_source_url
 pixel-old,Pixel 9,Google,2024,Pixel 9,79999,5000,2026-01-01,https://cpu.example/old
