@@ -81,6 +81,40 @@ describe('BenchmarkScatterPlot', () => {
     expect(ChartJS.lastConfig.data.datasets[0].data[0].phoneName).toBe('Galaxy S25');
   });
 
+  it('keeps each secondary point label below its model name and inside the chart area', () => {
+    const secondPoint = { ...cpuMetric.points[0], id: 's25-plus', phoneName: 'Galaxy S25+', x: 9300, priceInr: 99999 };
+    render(<BenchmarkScatterPlot metric={{ ...cpuMetric, points: [cpuMetric.points[0], secondPoint] }} />);
+
+    const labelPlugin = ChartJS.lastConfig.plugins.find((plugin) => plugin.id === 'benchmark-point-labels');
+    const fillText = vi.fn();
+    const context = {
+      save: vi.fn(), restore: vi.fn(), fillText, measureText: vi.fn(() => ({ width: 80 })),
+      set textBaseline(_value) {}, set font(_value) {}, set shadowColor(_value) {}, set shadowBlur(_value) {},
+      set textAlign(_value) {}, set fillStyle(_value) {}, set globalAlpha(_value) {},
+    };
+    const chart = {
+      ctx: context,
+      chartArea: { left: 20, top: 20, right: 180, bottom: 180 },
+      data: { datasets: [{ data: [cpuMetric.points[0], secondPoint] }] },
+      getDatasetMeta: () => ({ data: [
+        { getProps: () => ({ x: 25, y: 24 }) },
+        { getProps: () => ({ x: 175, y: 176 }) },
+      ] }),
+    };
+
+    labelPlugin.afterDatasetsDraw(chart, {}, {});
+
+    expect(fillText).toHaveBeenNthCalledWith(1, 'Galaxy S25', expect.any(Number), expect.any(Number));
+    expect(fillText).toHaveBeenNthCalledWith(2, 'Samsung · ₹79,999', expect.any(Number), expect.any(Number));
+    expect(fillText.mock.calls[1][2]).toBeGreaterThan(fillText.mock.calls[0][2]);
+    expect(fillText).toHaveBeenNthCalledWith(3, 'Galaxy S25+', expect.any(Number), expect.any(Number));
+    expect(fillText).toHaveBeenNthCalledWith(4, 'Samsung · ₹99,999', expect.any(Number), expect.any(Number));
+    expect(fillText.mock.calls[3][2]).toBeGreaterThan(fillText.mock.calls[2][2]);
+    expect(fillText.mock.calls[0][1]).toBeGreaterThanOrEqual(chart.chartArea.left);
+    expect(fillText.mock.calls[0][1]).toBeLessThanOrEqual(chart.chartArea.right);
+    expect(fillText.mock.calls[3][2]).toBeLessThanOrEqual(chart.chartArea.bottom);
+  });
+
   it('keeps connecting series lines quieter than benchmark dots', () => {
     const metricWithSeries = {
       ...cpuMetric,

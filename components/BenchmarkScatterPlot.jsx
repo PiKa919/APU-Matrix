@@ -43,17 +43,23 @@ const benchmarkPointLabelsPlugin = {
 
       const label = point.phoneName || 'Unknown device';
       const secondary = `${point.phoneBrand || 'Unknown'} · ${formatPrice(point.priceInr)}`;
-      const labelWidth = ctx.measureText(label).width;
+      const lineHeight = 14;
+      const labelWidth = Math.max(ctx.measureText(label).width, ctx.measureText(secondary).width);
       const placeLeft = position.x + 9 + labelWidth > chartArea.right;
-      const labelX = placeLeft ? position.x - 9 : position.x + 9;
-      const verticalOffset = index % 2 === 0 ? -10 : 10;
+      const desiredX = placeLeft ? position.x - 9 : position.x + 9;
+      const labelX = Math.max(
+        chartArea.left + (placeLeft ? labelWidth : 0),
+        Math.min(chartArea.right - (placeLeft ? 0 : labelWidth), desiredX),
+      );
+      const desiredY = position.y + (index % 2 === 0 ? -10 : 10);
+      const labelY = Math.max(chartArea.top + 6, Math.min(chartArea.bottom - lineHeight, desiredY));
 
       ctx.textAlign = placeLeft ? 'right' : 'left';
       ctx.fillStyle = brandColor(point.phoneBrand);
-      ctx.fillText(label, labelX, position.y + verticalOffset);
+      ctx.fillText(label, labelX, labelY);
       ctx.font = '500 10px system-ui, -apple-system, sans-serif';
       ctx.globalAlpha = 0.68;
-      ctx.fillText(secondary, labelX, position.y + verticalOffset + (verticalOffset < 0 ? 14 : -14));
+      ctx.fillText(secondary, labelX, labelY + lineHeight);
       ctx.globalAlpha = 1;
     });
 
