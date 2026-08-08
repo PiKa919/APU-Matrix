@@ -111,7 +111,11 @@ describe('BenchmarkScatterPlot', () => {
     expect(fillText).toHaveBeenNthCalledWith(4, 'Samsung · ₹99,999', expect.any(Number), expect.any(Number));
     expect(fillText.mock.calls[3][2]).toBeGreaterThan(fillText.mock.calls[2][2]);
     expect(fillText.mock.calls[0][1]).toBeGreaterThanOrEqual(chart.chartArea.left);
-    expect(fillText.mock.calls[0][1]).toBeLessThanOrEqual(chart.chartArea.right);
+    expect(fillText.mock.calls[0][1] + 80).toBeLessThanOrEqual(chart.chartArea.right);
+    expect(fillText.mock.calls[2][1] - 80).toBeGreaterThanOrEqual(chart.chartArea.left);
+    expect(fillText.mock.calls[2][1]).toBeLessThanOrEqual(chart.chartArea.right);
+    expect(fillText.mock.calls[0][2]).toBeGreaterThanOrEqual(chart.chartArea.top);
+    expect(fillText.mock.calls[1][2]).toBeLessThanOrEqual(chart.chartArea.bottom);
     expect(fillText.mock.calls[3][2]).toBeLessThanOrEqual(chart.chartArea.bottom);
   });
 
