@@ -7,20 +7,19 @@ galaxy-s24-duplicate,Samsung Galaxy S24,Samsung,2024,Galaxy S,Galaxy S24,79999,l
 galaxy-s25,Samsung Galaxy S25,Samsung,2025,Galaxy S,Galaxy S25,84999,current,Snapdragon 8 Elite,2100000,2300,7500,https://cpu.example/s25,1400,Geekbench AI,Hexagon,quantized,https://ai.example/s25,,,https://price.example/s25
 iphone-16, iPhone 16,Apple,2024,iPhone,iPhone 16,79900,current,A18,1700000,2200,7200,https://cpu.example/iphone-16,1300,Geekbench AI,Neural Engine,quantized,https://ai.example/iphone-16,,,https://price.example/iphone-16`;
 
+const seriesFixture = `id,phone_name,phone_brand,release_year,device_family,canonical_model,y_price_inr,cpu_geekbench6_multi_core
+s24,Samsung Galaxy S24,Samsung,2024,Galaxy S,Galaxy S24,79999,6800
+s25,Samsung Galaxy S25,Samsung,2025,Galaxy S,Galaxy S25,84999,7500
+s26,Samsung Galaxy S26,Samsung,2026,Galaxy S,Galaxy S26,89999,8200
+s26-plus,Samsung Galaxy S26+,Samsung,2026,Galaxy S,Galaxy S26+,99999,8400
+s26-ultra,Samsung Galaxy S26 Ultra,Samsung,2026,Galaxy S,Galaxy S26 Ultra,119999,8600`;
+
 describe('buildBenchmarkGraphData', () => {
-  it('deduplicates repeated canonical models and groups safe same-brand family lines', () => {
+  it('deduplicates repeated canonical models and keeps single-generation lines only', () => {
     const data = buildBenchmarkGraphData(csvFixture);
 
     expect(data.metrics.cpu.points).toHaveLength(3);
-    expect(data.metrics.cpu.series).toEqual([
-      expect.objectContaining({
-        id: 'Samsung:Galaxy S',
-        points: [
-          expect.objectContaining({ phoneName: 'Samsung Galaxy S24' }),
-          expect.objectContaining({ phoneName: 'Samsung Galaxy S25' }),
-        ],
-      }),
-    ]);
+    expect(data.metrics.cpu.series).toEqual([]);
     expect(data.metrics.cpu.points.find((point) => point.phoneName === 'Samsung Galaxy S24')).toEqual(expect.objectContaining({
       phoneBrand: 'Samsung',
       x: 6800,
@@ -33,6 +32,21 @@ describe('buildBenchmarkGraphData', () => {
 
   it('keeps GPU empty when no complete 3DMark score and price pair exists', () => {
     expect(buildBenchmarkGraphData(csvFixture).metrics.gpu.points).toEqual([]);
+  });
+
+  it('connects only sibling variants within one phone generation', () => {
+    const series = buildBenchmarkGraphData(seriesFixture).metrics.cpu.series;
+
+    expect(series).toContainEqual(expect.objectContaining({
+      id: 'Samsung:Galaxy S26',
+      points: expect.arrayContaining([
+        expect.objectContaining({ phoneName: 'Samsung Galaxy S26' }),
+        expect.objectContaining({ phoneName: 'Samsung Galaxy S26+' }),
+        expect.objectContaining({ phoneName: 'Samsung Galaxy S26 Ultra' }),
+      ]),
+    }));
+    expect(series.map((item) => item.id)).not.toContain('Samsung:Galaxy S');
+    expect(series.flatMap((item) => item.points.map((point) => point.phoneName))).not.toContain('Samsung Galaxy S25');
   });
 
   it('provides a display label for every metric returned to the chart', () => {
