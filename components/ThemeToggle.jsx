@@ -21,8 +21,12 @@ function subscribe(onStoreChange) {
   return () => window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
 }
 
+export function useTheme() {
+  return useSyncExternalStore(subscribe, getClientTheme, getServerTheme);
+}
+
 export default function ThemeToggle() {
-  const theme = useSyncExternalStore(subscribe, getClientTheme, getServerTheme);
+  const theme = useTheme();
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;

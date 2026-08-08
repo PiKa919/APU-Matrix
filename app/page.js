@@ -3,7 +3,7 @@
 import { createElement as h, useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { RefreshCw } from 'lucide-react';
-import ThemeToggle from '@/components/ThemeToggle';
+import ThemeToggle, { useTheme } from '@/components/ThemeToggle';
 import LeaderboardStage from '@/components/LeaderboardStage';
 import DeviceSnapshotTable from '@/components/DeviceSnapshotTable';
 import FieldNotesPreview from '@/components/FieldNotesPreview';
@@ -39,6 +39,7 @@ export default function Dashboard() {
   const [benchmarkData, setBenchmarkData] = useState(null);
   const [benchmarkLoading, setBenchmarkLoading] = useState(true);
   const [benchmarkError, setBenchmarkError] = useState(null);
+  const theme = useTheme();
 
   const fetchData = useCallback(async (isActive = () => true) => {
     setLoading(true);
@@ -127,7 +128,7 @@ export default function Dashboard() {
         ),
         h(HeroProcessorScene)
       ),
-      h(LeaderboardStage, { id: 'leaderboard', loading, error, lastUpdated, benchmarkData, benchmarkLoading, benchmarkError }),
+      h(LeaderboardStage, { id: 'leaderboard', loading, error, lastUpdated, benchmarkData, benchmarkLoading, benchmarkError, theme }),
       h(
         'section',
         { className: 'insight-strip', 'aria-label': 'How future benchmark views are read' },

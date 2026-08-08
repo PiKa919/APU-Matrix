@@ -23,7 +23,7 @@ function formatSourceStatus({ loading, error, lastUpdated }) {
   return 'Device data has not been collected yet.';
 }
 
-export default function LeaderboardStage({ id = 'leaderboard', loading = false, error = null, lastUpdated = null, benchmarkData = null, benchmarkLoading = false, benchmarkError = null }) {
+export default function LeaderboardStage({ id = 'leaderboard', loading = false, error = null, lastUpdated = null, benchmarkData = null, benchmarkLoading = false, benchmarkError = null, theme = 'dark' }) {
   const [metricId, setMetricId] = useState('cpu');
   const metric = METRICS.find((item) => item.id === metricId) ?? METRICS[0];
   const sourceStatus = formatSourceStatus({ loading, error, lastUpdated });
@@ -69,7 +69,7 @@ export default function LeaderboardStage({ id = 'leaderboard', loading = false, 
 
       {benchmarkLoading && <div className="graph-empty-state">Loading benchmark data…</div>}
       {!benchmarkLoading && benchmarkError && <div className="graph-empty-state">Benchmark data unavailable: {benchmarkError}</div>}
-      {!benchmarkLoading && !benchmarkError && selectedMetric && <BenchmarkScatterPlot metric={selectedMetric} />}
+      {!benchmarkLoading && !benchmarkError && selectedMetric && <BenchmarkScatterPlot metric={selectedMetric} theme={theme} />}
       {!benchmarkLoading && !benchmarkError && !selectedMetric && <div className="graph-empty-state">Benchmark data has not been collected yet.</div>}
     </section>
   );

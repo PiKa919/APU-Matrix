@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import Dashboard from '../app/page.js';
 
 vi.mock('chart.js', () => {
-  class MockChart { static register = vi.fn(); constructor() {} destroy() {} }
+  class MockChart { static register = vi.fn(); constructor(_context, config) { globalThis.latestChartConfig = config; } destroy() {} }
   return { Chart: MockChart, LinearScale: {}, LineController: {}, LineElement: {}, PointElement: {}, ScatterController: {}, Tooltip: {} };
 });
 
@@ -69,5 +69,17 @@ describe('Dashboard', () => {
     expect(global.fetch).toHaveBeenCalledTimes(4);
     expect(await screen.findByRole('table', { name: 'Current device data' })).toBeInTheDocument();
     expect(screen.getByRole('status', { name: 'Leaderboard data status' })).toHaveTextContent('Current device data updated');
+  });
+
+  it('updates chart colors when the live theme toggle changes', async () => {
+    render(<Dashboard />);
+
+    expect(await screen.findByRole('table', { name: 'Benchmark points' })).toBeInTheDocument();
+    expect(globalThis.latestChartConfig.options.scales.x.title.color).toBe('#cbd5e1');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to light theme' }));
+
+    expect(globalThis.latestChartConfig.options.scales.x.title.color).toBe('#334155');
+    expect(globalThis.latestChartConfig.options.plugins['benchmark-chart-background'].color).toBe('#ffffff');
   });
 });
