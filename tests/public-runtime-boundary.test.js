@@ -84,4 +84,9 @@ describe('public runtime boundary', () => {
       'date-fns',
     ].filter((dependency) => dependency in dependencies)).toEqual([]);
   });
+
+  it('uses Bun lockfiles only', () => {
+    expect(['package-lock.json', 'pnpm-lock.yaml'].filter(exists)).toEqual([]);
+    expect(exists('bun.lock')).toBe(true);
+  });
 });
