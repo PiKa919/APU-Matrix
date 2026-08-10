@@ -41,7 +41,7 @@ export default function BenchmarkScatterPlot({ metric, theme = 'dark' }) {
   const emptyLabel = metric.label.startsWith('3DMark') ? '3DMark' : metric.label;
   if (!metric.points.length) return <section className="graph-empty-state">{emptyLabel} data is not available yet.</section>;
 
-  return <figure className="benchmark-graph" aria-label={`${chartLabel} price versus performance chart`}>
+  return <figure className="benchmark-graph shrink-safe" aria-label={`${chartLabel} price versus performance chart`}>
     <figcaption>{chartDescription}</figcaption>
     <div className="benchmark-canvas" data-chart-theme={theme}>
       <Chart

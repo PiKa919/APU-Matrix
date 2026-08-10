@@ -80,7 +80,7 @@ export default function LeaderboardStage({ id = 'leaderboard', loading = false, 
   }
 
   return (
-    <section id={id} className="leaderboard-stage" aria-labelledby="leaderboard-heading">
+    <section id={id} className="leaderboard-stage shrink-safe" aria-labelledby="leaderboard-heading">
       <div className="section-kicker">Performance index</div>
       <div className="stage-heading-row">
         <div>

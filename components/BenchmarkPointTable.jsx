@@ -136,7 +136,7 @@ function BenchmarkPointTableContent({ points = [], metricId = 'cpu' }) {
   ];
 
   return (
-    <section className="benchmark-point-table" aria-labelledby="benchmark-points-heading">
+    <section className="benchmark-point-table shrink-safe" aria-labelledby="benchmark-points-heading">
       <div className="benchmark-table-heading">
         <div>
           <div className="section-kicker">Data points</div>
@@ -165,7 +165,7 @@ function BenchmarkPointTableContent({ points = [], metricId = 'cpu' }) {
         </div>
       ) : null}
 
-      <div className="benchmark-table-wrap">
+      <div className="benchmark-table-wrap shrink-safe">
         <table aria-label="Benchmark points">
           <thead>
             <tr>

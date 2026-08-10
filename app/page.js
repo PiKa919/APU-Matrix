@@ -114,10 +114,10 @@ export default function Dashboard() {
     ),
     h(
       'main',
-      { id: 'top', className: 'page-content' },
+      { id: 'top', className: 'page-content shrink-safe' },
       h(
         'section',
-        { className: 'hero', 'aria-labelledby': 'hero-heading' },
+        { className: 'hero shrink-safe', 'aria-labelledby': 'hero-heading' },
         h(
           'div',
           { className: 'hero-copy' },

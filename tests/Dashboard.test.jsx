@@ -50,6 +50,15 @@ describe('Dashboard', () => {
     expect(screen.getByText('OnePlus 15')).toBeInTheDocument();
     expect(screen.getByRole('table', { name: 'Benchmark points' })).toHaveTextContent('Galaxy S25');
     expect(screen.getByRole('heading', { name: 'Field Notes' })).toBeInTheDocument();
+
+    const main = screen.getByRole('main');
+    expect(main).toHaveClass('shrink-safe');
+    expect(main.querySelector('.hero')).toHaveClass('shrink-safe');
+    expect(main.querySelector('.leaderboard-stage')).toHaveClass('shrink-safe');
+    expect(main.querySelector('.benchmark-graph')).toHaveClass('shrink-safe');
+    expect(main.querySelector('.benchmark-table-wrap')).toHaveClass('shrink-safe');
+    expect(main.querySelector('.snapshot-panel')).toHaveClass('shrink-safe');
+    expect(main.querySelector('.snapshot-scroll')).toHaveClass('shrink-safe');
   });
 
   it('shows a useful error state when the device request fails and lets readers retry', async () => {
