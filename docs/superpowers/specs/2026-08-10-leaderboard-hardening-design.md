@@ -14,19 +14,29 @@ Finish the first public leaderboard release by correcting responsive defects, re
 
 ## Chart-library decision
 
-Retain Chart.js 4.5.1 for this release.
+Replace Chart.js with TanStack Charts for this release. The user has explicitly accepted the pre-1.0 migration risk.
 
-TanStack Charts can express the required layered scatter and line visualization. Its official documentation provides responsive SVG, optional Canvas, keyboard focus, native tooltips, theme inheritance, and framework adapters. However, the current package is version 0.9.0, was published on 2026-08-09, and the core package currently declares 19 dependencies. Migrating a tested chart immediately before release would add API and regression risk without addressing the measured bottlenecks in this application.
+Pin the migration to these exact direct dependencies so a later 0.x API change cannot enter through a routine install:
 
-The actual bottlenecks are the unbounded HTML tables, label overdraw for 113 AnTuTu points, mobile min-content overflow, and obsolete scraper routes in the frontend build. These will be fixed directly.
+- `@tanstack/charts@0.9.0`
+- `@tanstack/react-charts@0.9.0`
+- `d3-scale@4.0.2`
 
-Reconsider TanStack Charts after a stable 1.x release and only after a small branch experiment proves visual parity, keyboard interaction parity, label behavior, and a smaller production client bundle than the optimized Chart.js implementation.
+Use the default React SVG adapter. The current maximum of 113 AnTuTu points is small enough for independently focusable SVG marks, and SVG preserves accessible structure, theme inheritance, and crisp labels. Canvas remains an optional measured fallback rather than the default.
+
+The chart definition composes built-in `lineY`, `dot`, and `text` marks. Application code continues to own filtering, sibling-series grouping, dense-label selection, and table state. TanStack Charts owns responsive ranges, guides, rendering, focus, native tooltips, and lifecycle.
+
+Definitions are memoized and rebuilt only when the selected metric, visible points, sibling series, theme tokens, or label subset changes. Table sorting and pagination must not rebuild the chart definition.
+
+After visual and behavioral parity is proven, remove Chart.js and its unused adapters/plugins instead of shipping two chart engines.
 
 References:
 
 - [TanStack Charts overview](https://tanstack.com/charts/latest/docs/overview)
 - [TanStack Charts React adapter](https://tanstack.com/charts/latest/docs/framework/react/adapter)
 - [TanStack Charts large-data guidance](https://tanstack.com/charts/latest/docs/guides/large-data)
+- [TanStack Charts marks and layering](https://tanstack.com/charts/latest/docs/concepts/marks-and-layering)
+- [TanStack Charts focus and interaction](https://tanstack.com/charts/latest/docs/reference/focus-and-interaction)
 
 ## Responsive layout
 
@@ -66,6 +76,7 @@ A visible caption states that lines connect sibling variants and are not regress
 - For a metric with more than 30 points, persistent labels are limited to a deterministic useful subset: the ten highest performance points plus endpoints of visible sibling-variant series.
 - Every point remains available through pointer and keyboard focus, tooltip content, and the adjacent data table.
 - Label reduction affects presentation only; it must not remove points or rows.
+- Persistent labels use the built-in `text` mark and the same x/y scales as the point layer.
 
 ### Metric metadata
 
@@ -110,17 +121,18 @@ Both tables use scoped column headers, visible focus styles, and disabled pagina
 - Paginate both tables so the initial DOM contains at most 25 rows from each data surface.
 - Keep only the active metric chart mounted.
 - Memoize filtered metric data, series, filter options, and sorted/paginated rows.
-- Preserve Chart.js lifecycle cleanup and avoid recreating the chart for unrelated table pagination changes.
+- Memoize the TanStack chart definition and avoid recreating it for unrelated table pagination changes.
+- Use TanStack's native focus and tooltip model so pointer and keyboard users receive equivalent point metadata.
 - Keep the Three.js scene dynamically imported, reduced-motion aware, and isolated from chart/data state.
 - Remove the six scraper API routes and their frontend-only import chain from the isolated public frontend worktree. The scraper and datasets in the main checkout remain untouched.
-- Remove Chart.js adapters/plugins only if the import audit confirms that the active frontend does not use them.
+- Remove `chart.js`, `react-chartjs-2`, `chartjs-adapter-date-fns`, `chartjs-plugin-datalabels`, and `date-fns` after the TanStack chart passes parity tests and the import audit confirms no remaining consumer.
 - The production build must complete without MongoDB credential warnings.
 
 ## Scope boundaries
 
 - Do not fabricate GPU values, prices, benchmark scores, sources, or editorial content.
 - Do not implement Devices, Processors, or Field Notes routes in this increment.
-- Do not migrate to TanStack Charts in this increment.
+- Do not keep a hidden Chart.js fallback after TanStack parity is proven.
 - Do not modify the main checkout's scraper scripts or datasets.
 - Do not change the existing device or benchmark API response contracts except to add optional point metadata already present in the CSV.
 
@@ -136,7 +148,9 @@ Automated coverage must include:
 - benchmark-table sorting, search, pagination, and page reset;
 - snapshot sorting, search, pagination, and mobile details;
 - accessible captions, headers, loading, error, empty, and pagination states;
-- chart lifecycle stability when only table pagination changes;
+- stable TanStack chart-definition identity when only table pagination changes;
+- TanStack scene geometry containing every visible point, every valid sibling line, and only the selected persistent labels;
+- pointer and keyboard focus exposing equivalent tooltip metadata;
 - absence of scraper routes from the production route manifest.
 
 Final verification requires:
