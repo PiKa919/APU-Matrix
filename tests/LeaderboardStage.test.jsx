@@ -172,7 +172,17 @@ describe('LeaderboardStage', () => {
     render(<LeaderboardStage benchmarkData={benchmarkData} />);
     fireEvent.click(screen.getByRole('button', { name: 'GPU' }));
 
-    expect(screen.getByText('3DMark data is not available yet.')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Benchmark availability' })).toHaveTextContent('3DMark data is not available yet.');
+  });
+
+  it('announces benchmark loading and errors with status semantics', () => {
+    const { rerender } = render(<LeaderboardStage benchmarkLoading />);
+
+    expect(screen.getByRole('status', { name: 'Benchmark data status' })).toHaveTextContent('Loading benchmark data');
+
+    rerender(<LeaderboardStage benchmarkLoading={false} benchmarkError="Service unavailable" />);
+
+    expect(screen.getByRole('alert', { name: 'Benchmark data error' })).toHaveTextContent('Service unavailable');
   });
 
   it('politely announces that current device data is being collected', () => {

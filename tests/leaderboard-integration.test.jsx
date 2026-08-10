@@ -100,7 +100,8 @@ describe('leaderboard release integration', () => {
 
     render(<Dashboard />);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Device data unavailable');
+    expect(await screen.findByRole('alert', { name: 'Benchmark data error' })).toHaveTextContent('Benchmark data unavailable');
+    expect(screen.getByText('Device data unavailable')).toBeInTheDocument();
     expect(screen.getByText('Benchmark data unavailable: Benchmark data unavailable')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Refresh data' }));
 
@@ -125,7 +126,7 @@ describe('leaderboard release integration', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'GPU' }));
     expect(screen.queryAllByTestId('active-tanstack-chart')).toHaveLength(0);
-    expect(screen.getByText('3DMark data is not available yet.')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Benchmark availability' })).toHaveTextContent('3DMark data is not available yet.');
   });
 
   it('resets a zero-result filter state and returns the selected metric data', () => {
@@ -158,7 +159,8 @@ describe('leaderboard release integration', () => {
     expect(svg.tagName.toLowerCase()).toBe('svg');
     expect(svg).toHaveAttribute('tabindex', '0');
     expect(svg.querySelector('desc')).toHaveTextContent('not trend or regression lines');
-    expect(screen.getByRole('complementary', { name: 'Benchmark point metadata' })).toHaveTextContent('Galaxy S25');
+    expect(screen.queryByRole('complementary', { name: 'Benchmark point metadata' })).not.toBeInTheDocument();
+    expect(svg.querySelector('desc')).toHaveTextContent('benchmark points are shown');
   });
 
   it('renders exact-generation sibling connector geometry in the TanStack scene', () => {

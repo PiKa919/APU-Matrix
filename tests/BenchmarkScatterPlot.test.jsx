@@ -5,8 +5,8 @@ import BenchmarkScatterPlot from '@/components/BenchmarkScatterPlot';
 import BenchmarkPointTable from '@/components/BenchmarkPointTable';
 
 vi.mock('@tanstack/react-charts', () => ({
-  Chart: ({ definition, ariaLabel, ariaDescription }) => (
-    <div data-testid="tanstack-chart" aria-label={ariaLabel} aria-description={ariaDescription}>
+  Chart: ({ definition, ariaLabel, ariaDescription, height }) => (
+    <div data-testid="tanstack-chart" aria-label={ariaLabel} aria-description={ariaDescription} data-height={height}>
       {definition.marks?.map((mark, index) => <span key={`${index}`} data-mark={index}>{mark.data?.length ?? 0}</span>)}
     </div>
   ),
@@ -70,21 +70,39 @@ describe('BenchmarkScatterPlot', () => {
     expect(screen.getByTestId('tanstack-chart')).toHaveAttribute('aria-description', expect.stringContaining('sibling variants'));
   });
 
-  it('keeps CPU tooltip metadata in the adjacent HTML path', () => {
+  it('keeps the chart accessible summary without duplicating point metadata in the page DOM', () => {
     render(<BenchmarkScatterPlot metric={cpuMetric} />);
 
-    expect(screen.getByLabelText('Benchmark point metadata')).toHaveTextContent('Single-core: 1,914');
-    expect(screen.getByLabelText('Benchmark point metadata')).toHaveTextContent('Processor: Snapdragon 8 Elite');
+    expect(screen.getByTestId('tanstack-chart')).toHaveAttribute('aria-description', expect.stringContaining('1 benchmark point'));
+    expect(screen.queryByLabelText('Benchmark point metadata')).not.toBeInTheDocument();
   });
 
-  it('keeps AI backend, accelerator, precision, and processor metadata available', () => {
-    render(<BenchmarkScatterPlot metric={aiMetric} />);
-    const metadata = screen.getByLabelText('Benchmark point metadata');
+  it('does not render a metadata node for every point in a dense metric', () => {
+    const points = Array.from({ length: 113 }, (_, index) => ({
+      ...cpuMetric.points[0],
+      id: `phone-${index}`,
+      phoneName: `Phone ${index}`,
+      x: 8000 + index,
+    }));
 
-    expect(metadata).toHaveTextContent('Backend: NNAPI');
-    expect(metadata).toHaveTextContent('Accelerator: NPU');
-    expect(metadata).toHaveTextContent('Precision: Quantized');
-    expect(metadata).toHaveTextContent('Processor: Tensor G4');
+    render(<BenchmarkScatterPlot metric={{ ...cpuMetric, points }} />);
+
+    expect(screen.getByTestId('tanstack-chart')).toHaveAttribute('aria-description', expect.stringContaining('113 benchmark points'));
+    expect(screen.queryByLabelText('Benchmark point metadata')).not.toBeInTheDocument();
+  });
+
+  it('keeps AI compatibility metadata in the chart accessible summary', () => {
+    render(<BenchmarkScatterPlot metric={aiMetric} />);
+    const chart = screen.getByTestId('tanstack-chart');
+
+    expect(chart).toHaveAttribute('aria-description', expect.stringContaining('1 benchmark point'));
+    expect(screen.queryByLabelText('Benchmark point metadata')).not.toBeInTheDocument();
+  });
+
+  it('keeps the chart host height aligned with the responsive canvas fallback', () => {
+    render(<BenchmarkScatterPlot metric={cpuMetric} />);
+
+    expect(screen.getByTestId('tanstack-chart')).toHaveAttribute('data-height', '384');
   });
 
   it('does not rebuild the chart definition when only the table sort changes', () => {
@@ -113,7 +131,7 @@ describe('BenchmarkScatterPlot', () => {
   it('explains an unavailable GPU metric without mounting a chart', () => {
     render(<BenchmarkScatterPlot metric={gpuMetric} />);
 
-    expect(screen.getByText('3DMark data is not available yet.')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Benchmark availability' })).toHaveTextContent('3DMark data is not available yet.');
     expect(screen.queryByTestId('tanstack-chart')).not.toBeInTheDocument();
     expect(screen.queryByRole('table', { name: 'Benchmark points' })).not.toBeInTheDocument();
   });

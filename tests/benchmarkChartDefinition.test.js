@@ -2,6 +2,8 @@ import { createChartScene } from '@tanstack/charts';
 import { describe, expect, it } from 'vitest';
 import {
   createBenchmarkChartDefinition,
+  brandColor,
+  labelPlacement,
   selectPersistentLabels,
   tooltipRows,
 } from '@/lib/benchmarkChartDefinition';
@@ -21,6 +23,22 @@ function point(overrides = {}) {
 }
 
 describe('benchmark chart definition', () => {
+  it('assigns distinct colors to every supported company in the dataset', () => {
+    const brands = ['Infinix', 'Lenovo', 'Nubia', 'Red Magic', 'iQOO'];
+    const colors = brands.map((brand) => brandColor(brand));
+
+    expect(new Set(colors).size).toBe(brands.length);
+    expect(colors).not.toContain('#94a3b8');
+  });
+
+  it('uses deterministic label lanes to reduce dense-scene overlap', () => {
+    const points = Array.from({ length: 24 }, (_, index) => point({ id: `phone-${index}`, x: 1000 + index }));
+
+    expect(labelPlacement(points[0], points)).toEqual({ anchor: 'start', dx: 8, dy: -8 });
+    expect(labelPlacement(points[1], points)).toEqual({ anchor: 'end', dx: -8, dy: 8 });
+    expect(labelPlacement(points[2], points)).toEqual({ anchor: 'start', dx: 8, dy: 22 });
+  });
+
   it('keeps every point labelled when there are 24 points', () => {
     const points = Array.from({ length: 24 }, (_, index) => point({ id: `phone-${index}`, phoneName: `Phone ${index}`, x: 1000 + index }));
 

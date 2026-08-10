@@ -124,8 +124,8 @@ export default function LeaderboardStage({ id = 'leaderboard', loading = false, 
         ) : null}
       </div>
 
-      {benchmarkLoading && <div className="graph-empty-state">Loading benchmark data…</div>}
-      {!benchmarkLoading && benchmarkError && <div className="graph-empty-state">Benchmark data unavailable: {benchmarkError}</div>}
+      {benchmarkLoading && <div className="graph-empty-state" role="status" aria-live="polite" aria-label="Benchmark data status">Loading benchmark data…</div>}
+      {!benchmarkLoading && benchmarkError && <div className="graph-empty-state" role="alert" aria-live="assertive" aria-label="Benchmark data error">Benchmark data unavailable: {benchmarkError}</div>}
       {!benchmarkLoading && !benchmarkError && selectedMetric && selectedMetric.points.length === 0 && hasActiveFilters && (
         <div className="graph-empty-state" role="status" aria-label="Benchmark results">
           <p>No benchmark points match the selected filters.</p>
@@ -142,7 +142,7 @@ export default function LeaderboardStage({ id = 'leaderboard', loading = false, 
           />
         </>
       )}
-      {!benchmarkLoading && !benchmarkError && !selectedMetric && <div className="graph-empty-state">Benchmark data has not been collected yet.</div>}
+      {!benchmarkLoading && !benchmarkError && !selectedMetric && <div className="graph-empty-state" role="status" aria-live="polite" aria-label="Benchmark data status">Benchmark data has not been collected yet.</div>}
     </section>
   );
 }
