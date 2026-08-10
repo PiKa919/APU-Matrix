@@ -2,6 +2,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import LeaderboardStage from '@/components/LeaderboardStage';
 
+vi.mock('@/components/BenchmarkScatterPlot', async () => {
+  const actual = await vi.importActual('@/components/BenchmarkScatterPlot');
+  return { ...actual, default: vi.fn(actual.default) };
+});
+
+import BenchmarkScatterPlot from '@/components/BenchmarkScatterPlot';
+
 describe('LeaderboardStage', () => {
   const benchmarkData = {
     metrics: {
@@ -54,6 +61,30 @@ describe('LeaderboardStage', () => {
 
     expect(within(screen.getByRole('table', { name: 'Benchmark points' })).getByText('Galaxy S25')).toBeInTheDocument();
     expect(screen.queryByText('iPhone 16')).not.toBeInTheDocument();
+  });
+
+  it('rebuilds sibling series after filtering and drops connectors with one visible variant', () => {
+    const siblingPoints = [
+      { id: 's25', phoneName: 'Galaxy S25', phoneBrand: 'Samsung', x: 9200, priceInr: 79999, details: { processorName: 'Snapdragon 8 Elite' } },
+      { id: 's25-plus', phoneName: 'Galaxy S25+', phoneBrand: 'Samsung', x: 9400, priceInr: 89999, details: { processorName: 'Snapdragon 8 Elite' } },
+      { id: 's25-ultra', phoneName: 'Galaxy S25 Ultra', phoneBrand: 'Samsung', x: 9600, priceInr: 109999, details: { processorName: 'Tensor Test Fixture' } },
+    ];
+    const data = {
+      ...benchmarkData,
+      metrics: {
+        ...benchmarkData.metrics,
+        cpu: { ...benchmarkData.metrics.cpu, points: siblingPoints, series: [{ id: 'Samsung:Galaxy S25', points: siblingPoints }] },
+      },
+    };
+
+    render(<LeaderboardStage benchmarkData={data} />);
+
+    expect(BenchmarkScatterPlot.mock.calls.at(-1)[0].metric.series[0].points).toHaveLength(3);
+    fireEvent.change(screen.getByRole('combobox', { name: 'Processor' }), { target: { value: 'Tensor Test Fixture' } });
+
+    const latestMetric = BenchmarkScatterPlot.mock.calls.at(-1)[0].metric;
+    expect(latestMetric.points.map((point) => point.phoneName)).toEqual(['Galaxy S25 Ultra']);
+    expect(latestMetric.series).toEqual([]);
   });
 
   it('shows data-driven AnTuTu filters and applies them to the graph and table', () => {

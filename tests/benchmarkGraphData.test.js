@@ -14,6 +14,9 @@ s26,Samsung Galaxy S26,Samsung,2026,Galaxy S,Galaxy S26,89999,8200
 s26-plus,Samsung Galaxy S26+,Samsung,2026,Galaxy S,Galaxy S26+,99999,8400
 s26-ultra,Samsung Galaxy S26 Ultra,Samsung,2026,Galaxy S,Galaxy S26 Ultra,119999,8600`;
 
+const gpuFixture = `id,phone_name,phone_brand,release_year,device_family,canonical_model,y_price_inr,processor_name,gpu_3dmark_wild_life_extreme_score,gpu_3dmark_wild_life_extreme_fps,gpu_source_url
+pixel-9-pro,Google Pixel 9 Pro,Google,2024,Pixel 9,Pixel 9 Pro,99999,Tensor G4,4200,25.2,https://gpu.example/pixel-9-pro`;
+
 describe('buildBenchmarkGraphData', () => {
   it('deduplicates repeated canonical models and keeps single-generation lines only', () => {
     const data = buildBenchmarkGraphData(csvFixture);
@@ -22,6 +25,7 @@ describe('buildBenchmarkGraphData', () => {
     expect(data.metrics.cpu.series).toEqual([]);
     expect(data.metrics.cpu.points.find((point) => point.phoneName === 'Samsung Galaxy S24')).toEqual(expect.objectContaining({
       phoneBrand: 'Samsung',
+      processorName: 'Snapdragon 8 Gen 3',
       x: 6800,
       priceInr: 79999,
       priceType: 'launch',
@@ -37,18 +41,37 @@ describe('buildBenchmarkGraphData', () => {
   it('preserves metric-specific processor and benchmark metadata on every point', () => {
     const data = buildBenchmarkGraphData(csvFixture);
 
-    expect(data.metrics.cpu.points.find((point) => point.phoneBrand === 'Samsung').details).toEqual(expect.objectContaining({
-      cpuGeekbench6SingleCore: 2100,
+    expect(data.metrics.cpu.points.find((point) => point.phoneBrand === 'Samsung')).toEqual(expect.objectContaining({
       processorName: 'Snapdragon 8 Gen 3',
+      details: expect.objectContaining({
+        cpuGeekbench6SingleCore: 2100,
+        processorName: 'Snapdragon 8 Gen 3',
+      }),
     }));
-    expect(data.metrics.ai.points.find((point) => point.phoneBrand === 'Samsung').details).toEqual(expect.objectContaining({
-      aiBackend: 'Geekbench AI',
-      aiAccelerator: 'Hexagon',
-      aiPrecision: 'quantized',
+    expect(data.metrics.ai.points.find((point) => point.phoneBrand === 'Samsung')).toEqual(expect.objectContaining({
       processorName: 'Snapdragon 8 Gen 3',
+      details: expect.objectContaining({
+        aiBackend: 'Geekbench AI',
+        aiAccelerator: 'Hexagon',
+        aiPrecision: 'quantized',
+        processorName: 'Snapdragon 8 Gen 3',
+      }),
     }));
-    expect(data.metrics.antutu.points.find((point) => point.phoneBrand === 'Samsung').details).toEqual(expect.objectContaining({
+    expect(data.metrics.antutu.points.find((point) => point.phoneBrand === 'Samsung')).toEqual(expect.objectContaining({
       processorName: 'Snapdragon 8 Gen 3',
+      details: expect.objectContaining({ processorName: 'Snapdragon 8 Gen 3' }),
+    }));
+  });
+
+  it('keeps GPU FPS and processor metadata on a populated GPU point', () => {
+    const point = buildBenchmarkGraphData(gpuFixture).metrics.gpu.points[0];
+
+    expect(point).toEqual(expect.objectContaining({
+      processorName: 'Tensor G4',
+      details: {
+        gpuWildLifeExtremeFps: 25.2,
+        processorName: 'Tensor G4',
+      },
     }));
   });
 

@@ -66,3 +66,42 @@ The worktree contained approved uncommitted changes before Task 2, including `co
 ## Commit
 
 `feat: filter benchmark metrics consistently` (final commit hash is reported in the handoff)
+
+## Review Fixes
+
+Task 2 review findings were addressed without implementing the out-of-scope cascading-dropdown suggestion.
+
+### RED evidence
+
+```text
+bun run test -- tests/benchmarkGraphData.test.js tests/LeaderboardStage.test.jsx
+1 test file failed | 3 tests failed | 18 tests passed
+```
+
+The three expected failures were the new top-level `processorName` assertions for CPU/AI and the populated synthetic GPU point. The sibling-series filtering regression passed against the existing implementation.
+
+### Fixes
+
+- `pointFor()` now exposes `processorName` at the normalized point's top level for CPU, AI, GPU, and AnTuTu.
+- Added a test-only synthetic GPU CSV fixture covering `gpuWildLifeExtremeScore`, `gpuWildLifeExtremeFps`, and processor metadata; no runtime dataset values were added.
+- Added a real three-variant sibling-series stage regression. Filtering to the unique processor leaves one visible point and removes the connector series.
+- Cascading dropdown derivation remains unchanged because it is outside the Task 2 contract.
+
+### GREEN evidence
+
+```text
+bun run test -- tests/benchmarkGraphData.test.js tests/LeaderboardStage.test.jsx
+2 test files passed
+21 tests passed
+
+bun run test
+20 test files passed
+106 tests passed
+
+bun run lint
+eslint completed with zero errors and zero warnings
+```
+
+### Commit
+
+`test: cover metric metadata and filtered series`
