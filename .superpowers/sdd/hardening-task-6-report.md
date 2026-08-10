@@ -37,3 +37,21 @@ Status: complete
 ## Concerns
 
 - Responsive, dark/light, pointer, keyboard, and screenshot verification remain pending for the controller's browser/computer-use pass, as required by the task brief.
+
+## Review-gap closure
+
+- Replaced the mocked TanStack chart surface in the integration suite with real SVG rendering. The test now asserts the rendered chart is an SVG with `tabindex="0"`, retains the chart description, and exposes the configured definition tooltip payload alongside the rendered benchmark metadata. It does not claim a jsdom pointer or keyboard tooltip event was simulated; browser interaction remains controller-owned.
+- Added a `createChartScene` assertion that verifies the exact-generation sibling connector mark has three distinct geometry points for the Samsung sibling series.
+- Updated retry coverage so the initial `/api/devices` and `/api/benchmarks` requests both fail, the UI exposes both error states, Refresh retries both endpoints, and the recovered device/benchmark surfaces render.
+- Replaced the impossible zero-result processor value with valid `Samsung` and `Tensor G4` options whose combination has no matching point.
+- Fixed the confirmed mobile overflow root cause with the single explicit shrinkable page-grid track: `.page-content { grid-template-columns: minmax(0, 1fr); }`.
+
+## Fresh verification after review-gap closure
+
+- Focused: `bun run test -- tests/responsiveCss.test.js tests/leaderboard-integration.test.jsx` — 2 files, 8 tests passed.
+- Full suite: `bun run test` — 21 files, 127 tests passed.
+- Lint: `bun run lint` — passed with no warnings.
+- Build: `bun run build` — passed; emitted only `/`, `/_not-found`, `/api/benchmarks`, and `/api/devices`.
+- Runtime/build-input audit: clean; no MongoDB warning, scraper route, or legacy Chart.js residue.
+- `git diff --check` — clean.
+- Browser/computer screenshots and viewport measurements remain intentionally unperformed; the controller owns that verification.

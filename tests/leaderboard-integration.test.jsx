@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { createChartScene } from '@tanstack/charts';
 import Dashboard from '../app/page.js';
 import LeaderboardStage from '@/components/LeaderboardStage';
 import * as chartDefinition from '@/lib/benchmarkChartDefinition';
@@ -7,12 +8,6 @@ import { createBenchmarkChartDefinition } from '@/lib/benchmarkChartDefinition';
 
 vi.mock('@/components/HeroProcessorScene', () => ({
   default: () => <div aria-label="Animated processor lattice" role="img" />,
-}));
-
-vi.mock('@tanstack/react-charts', () => ({
-  Chart: ({ ariaLabel, ariaDescription }) => (
-    <div data-testid="active-tanstack-chart" role="img" aria-label={ariaLabel} data-aria-description={ariaDescription} />
-  ),
 }));
 
 function point(index, overrides = {}) {
@@ -27,7 +22,15 @@ function point(index, overrides = {}) {
   };
 }
 
-const cpuPoints = Array.from({ length: 26 }, (_, index) => point(index));
+const cpuPoints = [
+  ...Array.from({ length: 25 }, (_, index) => point(index)),
+  point(25, {
+    id: 'pixel-9',
+    phoneName: 'Pixel 9',
+    phoneBrand: 'Google',
+    details: { cpuGeekbench6SingleCore: 1914, processorName: 'Tensor G4' },
+  }),
+];
 const benchmarkData = {
   metrics: {
     cpu: {
@@ -87,10 +90,10 @@ describe('leaderboard release integration', () => {
     expect(screen.getByText('Loading current device data').closest('[role="status"]')).toBeInTheDocument();
   });
 
-  it('exposes an alert and retries both data sources after a failed device request', async () => {
+  it('exposes errors and retries both data sources after both requests fail', async () => {
     const fetchMock = vi.fn()
       .mockImplementationOnce(() => response('Device data unavailable', false))
-      .mockImplementationOnce(() => response(benchmarkData))
+      .mockImplementationOnce(() => response('Benchmark data unavailable', false))
       .mockImplementationOnce(() => response(deviceData))
       .mockImplementationOnce(() => response(benchmarkData));
     vi.stubGlobal('fetch', fetchMock);
@@ -98,6 +101,7 @@ describe('leaderboard release integration', () => {
     render(<Dashboard />);
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Device data unavailable');
+    expect(screen.getByText('Benchmark data unavailable: Benchmark data unavailable')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Refresh data' }));
 
     await waitFor(() => expect(screen.getByRole('table', { name: 'Current device data' })).toBeInTheDocument());
@@ -108,15 +112,15 @@ describe('leaderboard release integration', () => {
   it('mounts only the selected populated chart and keeps GPU as an honest empty state', () => {
     render(<LeaderboardStage benchmarkData={benchmarkData} />);
 
-    expect(screen.getAllByTestId('active-tanstack-chart')).toHaveLength(1);
+    expect(screen.getAllByRole('img', { name: 'CPU price versus performance chart' })).toHaveLength(1);
     expect(screen.getByRole('figure', { name: 'CPU price versus performance chart' })).toHaveTextContent('not trend or regression lines');
 
     fireEvent.click(screen.getByRole('button', { name: 'AI' }));
-    expect(screen.getAllByTestId('active-tanstack-chart')).toHaveLength(1);
+    expect(screen.getAllByRole('img', { name: 'AI price versus performance chart' })).toHaveLength(1);
     expect(screen.getByRole('figure', { name: 'AI price versus performance chart' })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'AnTuTu' }));
-    expect(screen.getAllByTestId('active-tanstack-chart')).toHaveLength(1);
+    expect(screen.getAllByRole('img', { name: 'AnTuTu price versus performance chart' })).toHaveLength(1);
     expect(screen.getByRole('figure', { name: 'AnTuTu price versus performance chart' })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'GPU' }));
@@ -128,28 +132,44 @@ describe('leaderboard release integration', () => {
     render(<LeaderboardStage benchmarkData={benchmarkData} />);
 
     fireEvent.change(screen.getByRole('combobox', { name: 'Brand' }), { target: { value: 'Samsung' } });
-    fireEvent.change(screen.getByRole('combobox', { name: 'Processor' }), { target: { value: 'A18' } });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Processor' }), { target: { value: 'Tensor G4' } });
 
     expect(screen.getByRole('status', { name: 'Benchmark results' })).toHaveTextContent('No benchmark points match');
     fireEvent.click(screen.getByRole('button', { name: 'Reset filters' }));
     expect(screen.getByRole('table', { name: 'Benchmark points' })).toHaveTextContent('Galaxy S25');
   });
 
-  it('keeps pointer and keyboard tooltip metadata equivalent at the chart-definition boundary', () => {
+  it('renders a keyboard-focusable SVG with the shared definition tooltip payload', () => {
     const pointFixture = cpuPoints[0];
     const definition = createBenchmarkChartDefinition({ metric: benchmarkData.metrics.cpu, theme: 'dark' });
-    const pointerContent = definition.tooltip.content([{ datum: pointFixture }]);
-    const keyboardContent = definition.tooltip.content([{ datum: pointFixture }]);
+    const definitionContent = definition.tooltip.content([{ datum: pointFixture }]);
 
     expect(definition.pointer).toBe(true);
     expect(definition.keyboard).toBe(true);
     expect(definition.focusRing).toBe(true);
-    expect(keyboardContent).toEqual(pointerContent);
-    expect(pointerContent.title).toBe(pointFixture.phoneName);
-    expect(pointerContent.rows).toEqual(expect.arrayContaining([
+    expect(definitionContent.title).toBe(pointFixture.phoneName);
+    expect(definitionContent.rows).toEqual(expect.arrayContaining([
       { label: 'Single-core', value: '2,200' },
       { label: 'Processor', value: 'Snapdragon 8 Elite' },
     ]));
+
+    render(<LeaderboardStage benchmarkData={benchmarkData} />);
+    const svg = screen.getByRole('img', { name: 'CPU price versus performance chart' });
+    expect(svg.tagName.toLowerCase()).toBe('svg');
+    expect(svg).toHaveAttribute('tabindex', '0');
+    expect(svg.querySelector('desc')).toHaveTextContent('not trend or regression lines');
+    expect(screen.getByRole('complementary', { name: 'Benchmark point metadata' })).toHaveTextContent('Galaxy S25');
+  });
+
+  it('renders exact-generation sibling connector geometry in the TanStack scene', () => {
+    const metric = benchmarkData.metrics.cpu;
+    const definition = createBenchmarkChartDefinition({ metric, theme: 'dark' });
+    const scene = createChartScene(definition, { width: 720, height: 420 });
+    const connectorPoints = scene.points.filter((item) => item.markId === 'series-Samsung:Galaxy S25');
+
+    expect(connectorPoints).toHaveLength(3);
+    expect(connectorPoints.map((item) => item.datum.id)).toEqual(metric.series[0].points.map((item) => item.id));
+    expect(new Set(connectorPoints.map((item) => `${item.x}:${item.y}`))).toHaveLength(3);
   });
 
   it('does not rebuild the chart definition when table page, search, or sort changes', () => {
