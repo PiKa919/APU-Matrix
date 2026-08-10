@@ -1,13 +1,13 @@
 # Hardening Task 6: Leaderboard release readiness
 
-Status: complete
+Status: complete — automated and live-browser verified
 
 ## Scope
 
 - Added `tests/leaderboard-integration.test.jsx` as the automated integration portion of Task 6.
 - Kept the test at the existing Dashboard, LeaderboardStage, TanStack definition, and table boundaries.
 - No production components, CSS, dependencies, routes, datasets, or scraper files required changes for this task.
-- Browser/computer checks were intentionally not performed; the controller owns that verification.
+- Browser checks were initially deferred to the controller and completed after the automated fix pass.
 
 ## TDD evidence
 
@@ -36,7 +36,7 @@ Status: complete
 
 ## Concerns
 
-- Responsive, dark/light, pointer, keyboard, and screenshot verification remain pending for the controller's browser/computer-use pass, as required by the task brief.
+- The independent Computer Use API cannot access the Codex app for safety reasons. The dedicated in-app Browser plugin completed the authoritative browser QA instead.
 
 ## Review-gap closure
 
@@ -54,4 +54,18 @@ Status: complete
 - Build: `bun run build` — passed; emitted only `/`, `/_not-found`, `/api/benchmarks`, and `/api/devices`.
 - Runtime/build-input audit: clean; no MongoDB warning, scraper route, or legacy Chart.js residue.
 - `git diff --check` — clean.
-- Browser/computer screenshots and viewport measurements remain intentionally unperformed; the controller owns that verification.
+- Browser screenshots and viewport measurements were completed by the controller after this automated pass.
+
+## Live browser verification
+
+- 390 px dark and light: `scrollWidth === innerWidth === 390`; hero width 342 px; one active chart; no document overflow. The pre-fix measurement was 772 px and is retained as root-cause evidence.
+- 768 px dark and light: `scrollWidth === innerWidth === 768`; expected two-column hero at the exact breakpoint; one active chart.
+- 1440 px dark and light: `scrollWidth === innerWidth === 1440`; two-column hero and leaderboard chart render cleanly.
+- CPU: 24 plotted/table points and a visible sibling-connector caption.
+- AI: brand, processor, backend, accelerator, and precision controls present; Google filter produced 8 points and 8 rows.
+- AnTuTu: one active chart, brand/processor controls, deterministic label subset, 25 of 113 rows initially, and pagination advanced to rows 26–50.
+- GPU: no chart mounted and the UI states `3DMark data is not available yet.`
+- Benchmark search found 11 iPhone rows; Performance sorting toggled both directions.
+- Snapshot Price sort placed ₹14,999 first; pagination advanced from rows 1–25 to 26–50 of 146.
+- Browser console contained no warnings or errors.
+- Screenshots are stored locally under `.superpowers/sdd/evidence/` for 390 px, 768 px, and 1440 px in both themes.
