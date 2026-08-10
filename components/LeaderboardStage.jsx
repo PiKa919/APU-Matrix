@@ -133,13 +133,14 @@ export default function LeaderboardStage({ id = 'leaderboard', loading = false, 
         </div>
       )}
       {!benchmarkLoading && !benchmarkError && selectedMetric && (selectedMetric.points.length > 0 || !hasActiveFilters) && (
-        <BenchmarkScatterPlot metric={selectedMetric} theme={theme}>
+        <>
+          <BenchmarkScatterPlot metric={selectedMetric} theme={theme} />
           <BenchmarkPointTable
             points={selectedMetric.points}
             metricId={metricId}
             resetKey={`${metricId}:${filterKeys.map((key) => filters[key]).join('|')}`}
           />
-        </BenchmarkScatterPlot>
+        </>
       )}
       {!benchmarkLoading && !benchmarkError && !selectedMetric && <div className="graph-empty-state">Benchmark data has not been collected yet.</div>}
     </section>

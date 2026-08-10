@@ -16,7 +16,7 @@ function metricIdFor(metric) {
   return 'cpu';
 }
 
-export default function BenchmarkScatterPlot({ metric, theme = 'dark', children }) {
+export default function BenchmarkScatterPlot({ metric, theme = 'dark' }) {
   const chartInputKey = chartDefinition.benchmarkChartInputKey(metric, theme);
   const definition = useMemo(
     () => chartDefinition.createBenchmarkChartDefinition({ metric, theme }),
@@ -57,6 +57,5 @@ export default function BenchmarkScatterPlot({ metric, theme = 'dark', children 
         <ul>{item.rows.map((row) => <li key={row.label}>{row.label}: {row.value}</li>)}</ul>
       </div>)}
     </aside>
-    {children}
   </figure>;
 }

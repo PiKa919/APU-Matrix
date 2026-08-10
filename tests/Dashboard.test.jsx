@@ -48,7 +48,7 @@ describe('Dashboard', () => {
     expect(await screen.findByRole('table', { name: 'Current device data' })).toBeInTheDocument();
     expect(screen.getByRole('status', { name: 'Leaderboard data status' })).toHaveTextContent('Current device data updated');
     expect(screen.getByText('OnePlus 15')).toBeInTheDocument();
-    expect(within(screen.getByRole('figure', { name: 'CPU price versus performance chart' })).getByRole('table', { name: 'Benchmark points' })).toHaveTextContent('Galaxy S25');
+    expect(screen.getByRole('table', { name: 'Benchmark points' })).toHaveTextContent('Galaxy S25');
     expect(screen.getByRole('heading', { name: 'Field Notes' })).toBeInTheDocument();
   });
 

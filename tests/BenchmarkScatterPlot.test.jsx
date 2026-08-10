@@ -93,7 +93,10 @@ describe('BenchmarkScatterPlot', () => {
       cpuMetric.points[0],
       { ...cpuMetric.points[0], id: 's25-plus', phoneName: 'Galaxy S25+', phoneBrand: 'Samsung', x: 9400, priceInr: 99999 },
     ];
-    const renderWithTable = (metric) => <BenchmarkScatterPlot metric={metric}><BenchmarkPointTable points={metric.points} metricId="cpu" resetKey="cpu" /></BenchmarkScatterPlot>;
+    const renderWithTable = (metric) => <>
+      <BenchmarkScatterPlot metric={metric} />
+      <BenchmarkPointTable points={metric.points} metricId="cpu" resetKey="cpu" />
+    </>;
     const { rerender } = render(renderWithTable({ ...cpuMetric, points }));
     const initialCalls = factory.mock.calls.length;
 

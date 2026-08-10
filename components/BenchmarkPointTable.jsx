@@ -79,30 +79,11 @@ function resultLabel(start, end, total) {
     : `Showing ${start}–${end} of ${total} ${noun}`;
 }
 
-export default function BenchmarkPointTable({ points = [], metricId = 'cpu', resetKey = '' }) {
+function BenchmarkPointTableContent({ points = [], metricId = 'cpu' }) {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState(null);
+  const [page, setPage] = useState(1);
   const columns = useMemo(() => metricColumns(metricId), [metricId]);
-  const inputSignature = useMemo(() => JSON.stringify({
-    metricId,
-    resetKey,
-    search,
-    sort,
-    points: points.map((point) => ({
-      id: point.id,
-      phoneName: point.phoneName,
-      phoneBrand: point.phoneBrand,
-      processor: processorFor(point),
-      x: point.x,
-      priceInr: point.priceInr,
-      singleCore: detailFor(point, 'cpuGeekbench6SingleCore'),
-      backend: detailFor(point, 'aiBackend'),
-      accelerator: detailFor(point, 'aiAccelerator'),
-      precision: detailFor(point, 'aiPrecision'),
-      fps: detailFor(point, 'gpuWildLifeExtremeFps'),
-    })),
-  }), [metricId, points, resetKey, search, sort]);
-  const [pageState, setPageState] = useState({ signature: '', page: 1 });
 
   const searchedPoints = useMemo(() => {
     const query = search.trim().toLocaleLowerCase();
@@ -116,7 +97,6 @@ export default function BenchmarkPointTable({ points = [], metricId = 'cpu', res
   }, [searchedPoints, sort]);
 
   const pageCount = Math.max(1, Math.ceil(sortedPoints.length / PAGE_SIZE));
-  const page = pageState.signature === inputSignature ? pageState.page : 1;
   const visiblePage = Math.min(page, pageCount);
   const pagedPoints = useMemo(
     () => sortedPoints.slice((visiblePage - 1) * PAGE_SIZE, visiblePage * PAGE_SIZE),
@@ -127,17 +107,24 @@ export default function BenchmarkPointTable({ points = [], metricId = 'cpu', res
 
   function toggleSort(key) {
     if (!SORT_COLUMNS.has(key)) return;
+    setPage(1);
     setSort((current) => current?.key === key
       ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' }
       : { key, direction: 'asc' });
   }
 
   function clearSearch() {
+    setPage(1);
     setSearch('');
   }
 
+  function updateSearch(value) {
+    setPage(1);
+    setSearch(value);
+  }
+
   function changePage(nextPage) {
-    setPageState({ signature: inputSignature, page: nextPage });
+    setPage(nextPage);
   }
 
   const headers = [
@@ -161,7 +148,7 @@ export default function BenchmarkPointTable({ points = [], metricId = 'cpu', res
             type="search"
             aria-label="Search benchmark devices"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => updateSearch(event.target.value)}
             placeholder="Search device, brand, or processor"
           />
         </label>
@@ -217,4 +204,19 @@ export default function BenchmarkPointTable({ points = [], metricId = 'cpu', res
       </nav>
     </section>
   );
+}
+
+export default function BenchmarkPointTable({ points = [], metricId = 'cpu', resetKey = '' }) {
+  const pointsKey = useMemo(() => JSON.stringify(points.map((point) => ({
+    id: point.id,
+    phoneName: point.phoneName,
+    phoneBrand: point.phoneBrand,
+    processor: processorFor(point),
+    x: point.x,
+    priceInr: point.priceInr,
+    details: point.details,
+  }))), [points]);
+  const tableKey = `${metricId}:${resetKey}:${pointsKey}`;
+
+  return <BenchmarkPointTableContent key={tableKey} points={points} metricId={metricId} />;
 }

@@ -105,6 +105,41 @@ describe('BenchmarkPointTable', () => {
     expect(screen.getByText('Showing 1 of 1 result')).toBeInTheDocument();
   });
 
+  it('does not resurrect a prior page when a search toggles away and back', () => {
+    const points = Array.from({ length: 26 }, (_, index) => point({
+      id: `phone-${index}`,
+      phoneName: `Phone ${index + 1}`,
+    }));
+    render(<BenchmarkPointTable points={points} metricId="cpu" resetKey="all" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next benchmark results' }));
+    expect(screen.getByText('Showing 26 of 26 results')).toBeInTheDocument();
+
+    const search = screen.getByRole('searchbox', { name: 'Search benchmark devices' });
+    fireEvent.change(search, { target: { value: 'Phone 1' } });
+    fireEvent.change(search, { target: { value: '' } });
+
+    expect(screen.getByText('Showing 1–25 of 26 results')).toBeInTheDocument();
+    expect(screen.getByText('Phone 1')).toBeInTheDocument();
+    expect(screen.queryByText('Phone 26')).not.toBeInTheDocument();
+  });
+
+  it('resets to page one when the points collection changes', () => {
+    const points = Array.from({ length: 26 }, (_, index) => point({
+      id: `phone-${index}`,
+      phoneName: `Phone ${index + 1}`,
+    }));
+    const { rerender } = render(<BenchmarkPointTable points={points} metricId="cpu" resetKey="same" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next benchmark results' }));
+    expect(screen.getByText('Showing 26 of 26 results')).toBeInTheDocument();
+
+    rerender(<BenchmarkPointTable points={points.slice(0, 1)} metricId="cpu" resetKey="same" />);
+
+    expect(screen.getByText('Showing 1 of 1 result')).toBeInTheDocument();
+    expect(screen.getByText('Phone 1')).toBeInTheDocument();
+  });
+
   it('renders metric-specific metadata columns and scoped headers', () => {
     const cases = [
       ['cpu', ['Single-core', 'Processor'], ['Backend', 'Accelerator', 'Precision']],

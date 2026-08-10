@@ -46,7 +46,9 @@ describe('LeaderboardStage', () => {
     expect(screen.getByRole('button', { name: 'CPU' })).toHaveAttribute('aria-pressed', 'true');
     const figure = screen.getByRole('figure', { name: 'CPU price versus performance chart' });
     expect(figure).toBeInTheDocument();
-    expect(within(figure).getByRole('table', { name: 'Benchmark points' })).toHaveTextContent('Galaxy S25');
+    const table = screen.getByRole('table', { name: 'Benchmark points' });
+    expect(table).toHaveTextContent('Galaxy S25');
+    expect(figure).not.toContainElement(table);
     expect(screen.getByRole('combobox', { name: 'Brand' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Processor' })).toBeInTheDocument();
   });
@@ -112,7 +114,7 @@ describe('LeaderboardStage', () => {
 
     fireEvent.change(screen.getByRole('combobox', { name: 'Processor' }), { target: { value: 'Snapdragon 8 Elite' } });
     expect(screen.getAllByRole('row')).toHaveLength(2);
-    expect(within(screen.getByRole('figure', { name: 'AnTuTu price versus performance chart' })).getByRole('table', { name: 'Benchmark points' })).toHaveTextContent('Galaxy S25');
+    expect(screen.getByRole('table', { name: 'Benchmark points' })).toHaveTextContent('Galaxy S25');
   });
 
   it('exposes all AI compatibility filters and applies combined filtering', () => {
