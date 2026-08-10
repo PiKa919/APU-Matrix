@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import * as chartDefinition from '@/lib/benchmarkChartDefinition';
 import BenchmarkScatterPlot from '@/components/BenchmarkScatterPlot';
+import BenchmarkPointTable from '@/components/BenchmarkPointTable';
 
 vi.mock('@tanstack/react-charts', () => ({
   Chart: ({ definition, ariaLabel, ariaDescription }) => (
@@ -92,14 +93,15 @@ describe('BenchmarkScatterPlot', () => {
       cpuMetric.points[0],
       { ...cpuMetric.points[0], id: 's25-plus', phoneName: 'Galaxy S25+', phoneBrand: 'Samsung', x: 9400, priceInr: 99999 },
     ];
-    const { rerender } = render(<BenchmarkScatterPlot metric={{ ...cpuMetric, points }} />);
+    const renderWithTable = (metric) => <BenchmarkScatterPlot metric={metric}><BenchmarkPointTable points={metric.points} metricId="cpu" resetKey="cpu" /></BenchmarkScatterPlot>;
+    const { rerender } = render(renderWithTable({ ...cpuMetric, points }));
     const initialCalls = factory.mock.calls.length;
 
     fireEvent.click(screen.getByRole('button', { name: 'Brand' }));
-    rerender(<BenchmarkScatterPlot metric={{
+    rerender(renderWithTable({
       ...cpuMetric,
       points: points.map((point) => ({ ...point })),
-    }} />);
+    }));
 
     expect(factory).toHaveBeenCalledTimes(initialCalls);
     factory.mockRestore();

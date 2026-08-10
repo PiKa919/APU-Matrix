@@ -1,146 +1,61 @@
-# Task 3 Report: Phone Matching And Price Selection
+# Hardening Task 3 Report: Paginated Metric-Aware Benchmark Table
+
+## Status
+
+Complete. The inline benchmark table was extracted into `components/BenchmarkPointTable.jsx`, mounted by `LeaderboardStage` with `points`, `metricId`, and a filter-aware `resetKey`, and kept independent from the TanStack chart definition.
 
 ## Implemented
 
-- Added `lib/extraction/phone-matching.js` with:
-  - `normalizePhoneName(value)`
-  - `scorePhoneMatch(target, candidate)`
-  - `bestPhoneMatch(target, candidates, threshold = 0.55)`
-- Added `lib/extraction/price-selection.js` with:
-  - `selectPlottedPrice(launchPrices, currentPrices)`
-- Added focused tests for both modules under `tests/extraction/`.
+- Case-insensitive search across device name, brand, and processor.
+- Brand, Performance, and Price sorting with ascending/descending toggles and deterministic phone-name/id tie-breakers.
+- Fixed 25-row pages with visible result ranges and disabled Previous/Next boundary controls.
+- Page reset behavior for point/metric/filter changes, search changes, and sort changes without a cascading React effect.
+- Metric-specific columns:
+  - CPU: single-core and processor.
+  - AI: backend, accelerator, precision, and processor.
+  - GPU: FPS and processor.
+  - AnTuTu: processor.
+- Scoped column headers, `aria-sort`, polite result-count status, visible focus styles, and a clear-search action for zero-result searches.
+- Compact responsive table/search/pagination styling constrained to the existing table wrapper; no new document-level scroller was introduced.
+- Existing chart semantics, filters, TanStack definition memoization, dependencies, API routes, and Chart.js cleanup scope were left unchanged.
 
-## Behavior Covered
+## TDD evidence
 
-- Phone names are normalized by removing storage suffixes, bracketed qualifiers, and punctuation noise.
-- Phone match scoring favors exact and near-identical devices, while unrelated phones stay well below the threshold.
-- Best-match selection returns the top candidate only when it clears the confidence threshold.
-- Price selection prefers launch prices over current prices and picks the highest-confidence candidate within the chosen bucket.
+### RED
 
-## Verification
+Command:
 
-- `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js`
-- `npm test`
+```text
+bun run test -- tests/BenchmarkPointTable.test.jsx tests/BenchmarkScatterPlot.test.jsx
+```
 
-## Notes
+Result: expected failure because `@/components/BenchmarkPointTable` did not exist. The existing scatter suite remained green: 5 tests passed, 1 suite failed.
 
-- The focused extraction suites passed.
-- The full repo test run still fails in `tests/Dashboard.test.jsx` because `app/page.jsx` is missing in the current workspace. That failure is outside the files owned by this task.
+### GREEN
 
-## Controller Fix: Price Candidate Currency And Plus Matching
+Focused command:
 
-Applied after Task 3 review found two gaps:
-- `selectPlottedPrice()` rejected valid candidates that had `normalizedUSD` but no `normalizedINR`.
-- `normalizePhoneName()` stripped `+` instead of preserving it as `plus`.
+```text
+bun run test -- tests/BenchmarkPointTable.test.jsx tests/BenchmarkScatterPlot.test.jsx tests/LeaderboardStage.test.jsx
+```
 
-Changes:
-- Added `normalizedUSD` fallback validation/comparison in price selection.
-- Preserved `+` as `plus` after memory-configuration stripping in phone matching.
-- Added regression tests for USD-only launch candidates and `Pro+` / `Pro Plus` matching.
+Result: 3 test files passed, 24 tests passed.
 
-Verification:
-- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` failed with three expected regressions.
-- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 9 tests passed.
+Full verification:
 
-## Controller Fix: Mixed Currency Tie-Breaks And Plus Variant Guard
+```text
+bun run test
+bun run lint
+```
 
-Applied after re-review found two remaining gaps:
-- Price selection compared `normalizedINR` and `normalizedUSD` values as the same unit during equal-confidence tie-breaks.
-- Phone matching still allowed a Plus target to attach to a non-Plus candidate above threshold when no Plus candidate existed.
+Result: 21 test files passed, 112 tests passed; ESLint passed with no warnings or errors.
 
-Changes:
-- Added a unit-rank tie-break so INR-normalized prices win mixed-unit ties, while USD-only candidates remain valid fallbacks.
-- Added a Plus-variant guard so the `plus` token must agree between target and candidate names.
-- Added regression tests for mixed INR/USD tie-breaks and Plus-to-non-Plus overmatching.
+Additional check: `git diff --check` passed.
 
-Verification:
-- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` failed with the two expected regressions.
-- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 11 tests passed.
+## Dirty-boundary notes
 
-## Controller Fix: Broader Phone Variant Compatibility
+Only the Task 3 implementation files and this report are intended for the Task 3 commit. Pre-existing dirty changes remain unstaged, including `.gitignore`, prior SDD reports, `README.md`, API/data files, `HeroProcessorScene.jsx`, existing theme tests, and deleted `package-lock.json`/`pnpm-lock.yaml`. No scraper routes, dependencies, datasets, or unrelated CSS content were changed by this task.
 
-Applied after re-review found phone matching could still attach prices across distinct base/Ultra/Max variants and adjacent model generations. The same review also noted that the Plus guard broke spaced `One Plus` brand spellings.
+## Commit
 
-Changes:
-- Added regression tests for base-to-Ultra, Pro-to-Pro-Max, adjacent generation, and spaced `One Plus` brand matching.
-- Normalized known spaced brand prefixes before variant comparison.
-- Replaced the single Plus guard with variant-signature and numeric-model compatibility checks.
-
-Verification:
-- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the new overmatch and `One Plus` cases.
-- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 13 tests passed.
-
-## Controller Fix: Alphanumeric Model Alias Matching
-
-Applied after the second Task 3 review found three matcher gaps:
-- Digit-only model compatibility allowed cross-series false positives such as `A55` / `S55` and `16` / `16e`.
-- Compact/spaced aliases such as `GT7` / `GT 7` and `12R` / `12 R` failed to match.
-- `FE` / `Fan Edition` aliases were treated as incompatible.
-
-Changes:
-- Added regression tests for alphanumeric series mismatches, compact/spaced aliases, and `FE` / `Fan Edition`.
-- Canonicalized compact model aliases during phone-name normalization.
-- Replaced digit-only model compatibility with full digit-bearing model identifiers.
-- Mapped `Fan Edition` to `FE` before stop-word filtering.
-
-Verification:
-- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the three new review regressions.
-- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 16 tests passed.
-
-## Controller Fix: Subseries And Longer Compact Alias Matching
-
-Applied after the third Task 3 review found:
-- Same-number subseries false positives such as `Redmi Note 13` / `Redmi 13`.
-- Longer compact/spaced false negatives such as `GT Neo 6` / `GT Neo6`, `Z Fold 7` / `ZFold7`, and `Razr 50` / `Razr50`.
-
-Changes:
-- Added regression tests for Redmi subseries mismatches and longer compact/spaced aliases.
-- Added known-brand token handling to keep shared-number brand/subseries context meaningful.
-- Added broader compact model alias normalization for multi-token model families.
-- Added series-context compatibility so shared model numbers alone cannot pass matching.
-- Preserved `One Plus` / `OnePlus` spelling compatibility after early compaction.
-
-Verification:
-- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the two new review regressions.
-- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 18 tests passed.
-
-## Controller Fix: XL Variants And Connectivity Suffixes
-
-Applied after the fourth Task 3 review found:
-- `XL` variants could match non-XL models such as `Pixel 10 Pro XL` / `Pixel 10 Pro`.
-- Connectivity suffixes such as `5G` could be folded into compact aliases before stop-word filtering.
-
-Changes:
-- Added regression tests for `XL` / non-XL mismatch and omitted connectivity suffix matching.
-- Added `xl` to guarded model variant tokens.
-- Prevented compact alias generation from absorbing `4G` / `5G` suffixes.
-
-Verification:
-- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the two new review regressions.
-- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 20 tests passed.
-
-## Controller Fix: Compact Variant Suffix Aliases
-
-Applied after the fifth Task 3 review found compact variant suffix false negatives:
-- `Pixel 10 Pro XL` / `Pixel 10 ProXL`
-- `iPhone 16 Pro Max` / `iPhone 16 ProMax`
-- `Galaxy S24 FE` / `Galaxy S24FE`
-
-Changes:
-- Added regression tests for compact `ProXL`, `ProMax`, and `S24FE` aliases.
-- Split compact variant suffixes during matcher tokenization so compatibility checks see the same variant signature.
-
-Verification:
-- RED before implementation: `npm test -- tests/extraction/phone-matching.test.js` failed on the new compact suffix regression.
-- GREEN after implementation: `npm test -- tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 2 files and 21 tests passed.
-
-## Controller Self-Review Cleanup: OnePlus Brand Variant Guard
-
-Applied after local final review found compact variant splitting could treat the `oneplus` brand token as a Plus variant.
-
-Changes:
-- Added a regression test for `OnePlus 15` not matching `OnePlus 15 Plus`.
-- Skipped compact variant suffix splitting for known brand tokens.
-
-Verification:
-- `npm test -- tests/extraction/currency.test.js tests/extraction/processor-normalization.test.js tests/extraction/phone-matching.test.js tests/extraction/price-selection.test.js` passed, 4 files and 36 tests passed.
+Pending final scoped commit: `feat: paginate benchmark details`.

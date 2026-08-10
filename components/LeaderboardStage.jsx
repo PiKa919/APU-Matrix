@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Database, SlidersHorizontal } from 'lucide-react';
 import BenchmarkScatterPlot from '@/components/BenchmarkScatterPlot';
+import BenchmarkPointTable from '@/components/BenchmarkPointTable';
 
 const METRICS = [
   { id: 'cpu', label: 'CPU', color: '#72d7f6' },
@@ -131,7 +132,15 @@ export default function LeaderboardStage({ id = 'leaderboard', loading = false, 
           <button type="button" className="button button-secondary" onClick={() => setFilters({ ...INITIAL_FILTERS })}>Reset filters</button>
         </div>
       )}
-      {!benchmarkLoading && !benchmarkError && selectedMetric && (selectedMetric.points.length > 0 || !hasActiveFilters) && <BenchmarkScatterPlot metric={selectedMetric} theme={theme} />}
+      {!benchmarkLoading && !benchmarkError && selectedMetric && (selectedMetric.points.length > 0 || !hasActiveFilters) && (
+        <BenchmarkScatterPlot metric={selectedMetric} theme={theme}>
+          <BenchmarkPointTable
+            points={selectedMetric.points}
+            metricId={metricId}
+            resetKey={`${metricId}:${filterKeys.map((key) => filters[key]).join('|')}`}
+          />
+        </BenchmarkScatterPlot>
+      )}
       {!benchmarkLoading && !benchmarkError && !selectedMetric && <div className="graph-empty-state">Benchmark data has not been collected yet.</div>}
     </section>
   );
