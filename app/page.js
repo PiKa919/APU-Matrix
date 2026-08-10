@@ -77,8 +77,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     let active = true;
-    fetchData(() => active);
-    fetchBenchmarks(() => active);
+    queueMicrotask(() => {
+      if (!active) return;
+      fetchData(() => active);
+      fetchBenchmarks(() => active);
+    });
 
     return () => {
       active = false;
