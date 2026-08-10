@@ -1,11 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import Dashboard from '../app/page.js';
-
-vi.mock('chart.js', () => {
-  class MockChart { static register = vi.fn(); constructor(_context, config) { globalThis.latestChartConfig = config; } destroy() {} }
-  return { Chart: MockChart, LinearScale: {}, LineController: {}, LineElement: {}, PointElement: {}, ScatterController: {}, Tooltip: {} };
-});
 
 vi.mock('@/components/HeroProcessorScene', () => ({
   default: () => <div aria-label="Animated processor lattice" role="img" />,
@@ -53,7 +48,7 @@ describe('Dashboard', () => {
     expect(await screen.findByRole('table', { name: 'Current device data' })).toBeInTheDocument();
     expect(screen.getByRole('status', { name: 'Leaderboard data status' })).toHaveTextContent('Current device data updated');
     expect(screen.getByText('OnePlus 15')).toBeInTheDocument();
-    expect(screen.getByText('Galaxy S25')).toBeInTheDocument();
+    expect(within(screen.getByRole('figure', { name: 'CPU price versus performance chart' })).getByRole('table', { name: 'Benchmark points' })).toHaveTextContent('Galaxy S25');
     expect(screen.getByRole('heading', { name: 'Field Notes' })).toBeInTheDocument();
   });
 
@@ -74,12 +69,12 @@ describe('Dashboard', () => {
   it('updates chart colors when the live theme toggle changes', async () => {
     render(<Dashboard />);
 
-    expect(await screen.findByRole('table', { name: 'Benchmark points' })).toBeInTheDocument();
-    expect(globalThis.latestChartConfig.options.scales.x.title.color).toBe('#cbd5e1');
+    const figure = await screen.findByRole('figure', { name: 'CPU price versus performance chart' });
+    expect(figure.querySelector('[data-chart-theme="dark"]')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Switch to light theme' }));
 
-    expect(globalThis.latestChartConfig.options.scales.x.title.color).toBe('#334155');
-    expect(globalThis.latestChartConfig.options.plugins['benchmark-chart-background'].color).toBe('#ffffff');
+    expect(figure.querySelector('[data-chart-theme="light"]')).toBeInTheDocument();
+    expect(within(figure).getByRole('img', { name: 'CPU price versus performance chart' })).toHaveTextContent('price in INR');
   });
 });

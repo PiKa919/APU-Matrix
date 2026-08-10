@@ -1,11 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import LeaderboardStage from '@/components/LeaderboardStage';
-
-vi.mock('chart.js', () => {
-  class MockChart { static register = vi.fn(); constructor() {} destroy() {} }
-  return { Chart: MockChart, LinearScale: {}, LineController: {}, LineElement: {}, PointElement: {}, ScatterController: {}, Tooltip: {} };
-});
 
 describe('LeaderboardStage', () => {
   const benchmarkData = {

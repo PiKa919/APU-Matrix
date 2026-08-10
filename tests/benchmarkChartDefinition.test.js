@@ -53,6 +53,19 @@ describe('benchmark chart definition', () => {
     expect(ids).toEqual(expect.arrayContaining(['phone-0', 'phone-2']));
   });
 
+  it('renders duplicate point IDs only once in persistent labels', () => {
+    const points = [
+      point({ id: 'duplicate', phoneName: 'Phone A', x: 4000 }),
+      point({ id: 'duplicate', phoneName: 'Phone B', x: 3000 }),
+      point({ id: 'unique', phoneName: 'Phone C', x: 2000 }),
+    ];
+
+    expect(selectPersistentLabels(points, [])).toEqual([
+      expect.objectContaining({ id: 'duplicate', phoneName: 'Phone A' }),
+      expect.objectContaining({ id: 'unique' }),
+    ]);
+  });
+
   it('keeps every point, one line per valid series, and only selected text labels in the scene', () => {
     const points = Array.from({ length: 40 }, (_, index) => point({ id: `phone-${index}`, phoneName: `Phone ${index}`, x: index + 1 }));
     const series = [
@@ -100,6 +113,38 @@ describe('benchmark chart definition', () => {
       { label: 'Accelerator', value: 'NPU' },
       { label: 'Precision', value: 'Quantized' },
       { label: 'Processor', value: 'Tensor G5' },
+    ]));
+  });
+
+  it('exposes metric-specific rows through the configured tooltip callback', () => {
+    const cpuPoint = point({
+      details: { cpuGeekbench6SingleCore: 1914, processorName: 'Snapdragon 8 Elite' },
+    });
+    const aiPoint = point({
+      details: {
+        aiBackend: 'NNAPI',
+        aiAccelerator: 'NPU',
+        aiPrecision: 'Quantized',
+        processorName: 'Tensor G4',
+      },
+    });
+
+    const cpuDefinition = createBenchmarkChartDefinition({
+      metric: { id: 'cpu', label: 'Geekbench 6 multi-core', points: [cpuPoint], series: [] },
+    });
+    const aiDefinition = createBenchmarkChartDefinition({
+      metric: { id: 'ai', label: 'Geekbench AI quantized score', points: [aiPoint], series: [] },
+    });
+
+    expect(cpuDefinition.tooltip.content([{ datum: cpuPoint }]).rows).toEqual(expect.arrayContaining([
+      { label: 'Single-core', value: '1,914' },
+      { label: 'Processor', value: 'Snapdragon 8 Elite' },
+    ]));
+    expect(aiDefinition.tooltip.content([{ datum: aiPoint }]).rows).toEqual(expect.arrayContaining([
+      { label: 'Backend', value: 'NNAPI' },
+      { label: 'Accelerator', value: 'NPU' },
+      { label: 'Precision', value: 'Quantized' },
+      { label: 'Processor', value: 'Tensor G4' },
     ]));
   });
 });

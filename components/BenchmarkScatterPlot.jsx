@@ -60,9 +60,12 @@ function BenchmarkPointTable({ points }) {
 }
 
 export default function BenchmarkScatterPlot({ metric, theme = 'dark' }) {
+  const chartInputKey = chartDefinition.benchmarkChartInputKey(metric, theme);
   const definition = useMemo(
     () => chartDefinition.createBenchmarkChartDefinition({ metric, theme }),
-    [metric, theme],
+    // The semantic key intentionally replaces object identity for equivalent metric objects.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chartInputKey],
   );
   const metricId = metricIdFor(metric);
   const chartLabel = metric.chartLabel || metric.label;
@@ -83,7 +86,7 @@ export default function BenchmarkScatterPlot({ metric, theme = 'dark' }) {
 
   return <figure className="benchmark-graph" aria-label={`${chartLabel} price versus performance chart`}>
     <figcaption>{chartDescription}</figcaption>
-    <div className="benchmark-canvas">
+    <div className="benchmark-canvas" data-chart-theme={theme}>
       <Chart
         definition={definition}
         height={520}

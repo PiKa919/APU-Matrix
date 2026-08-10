@@ -88,13 +88,18 @@ describe('BenchmarkScatterPlot', () => {
 
   it('does not rebuild the chart definition when only the table sort changes', () => {
     const factory = vi.spyOn(chartDefinition, 'createBenchmarkChartDefinition');
-    render(<BenchmarkScatterPlot metric={{ ...cpuMetric, points: [
+    const points = [
       cpuMetric.points[0],
       { ...cpuMetric.points[0], id: 's25-plus', phoneName: 'Galaxy S25+', phoneBrand: 'Samsung', x: 9400, priceInr: 99999 },
-    ] }} />);
+    ];
+    const { rerender } = render(<BenchmarkScatterPlot metric={{ ...cpuMetric, points }} />);
     const initialCalls = factory.mock.calls.length;
 
     fireEvent.click(screen.getByRole('button', { name: 'Brand' }));
+    rerender(<BenchmarkScatterPlot metric={{
+      ...cpuMetric,
+      points: points.map((point) => ({ ...point })),
+    }} />);
 
     expect(factory).toHaveBeenCalledTimes(initialCalls);
     factory.mockRestore();
