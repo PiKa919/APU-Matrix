@@ -34,6 +34,39 @@ describe('buildBenchmarkGraphData', () => {
     expect(buildBenchmarkGraphData(csvFixture).metrics.gpu.points).toEqual([]);
   });
 
+  it('preserves metric-specific processor and benchmark metadata on every point', () => {
+    const data = buildBenchmarkGraphData(csvFixture);
+
+    expect(data.metrics.cpu.points.find((point) => point.phoneBrand === 'Samsung').details).toEqual(expect.objectContaining({
+      cpuGeekbench6SingleCore: 2100,
+      processorName: 'Snapdragon 8 Gen 3',
+    }));
+    expect(data.metrics.ai.points.find((point) => point.phoneBrand === 'Samsung').details).toEqual(expect.objectContaining({
+      aiBackend: 'Geekbench AI',
+      aiAccelerator: 'Hexagon',
+      aiPrecision: 'quantized',
+      processorName: 'Snapdragon 8 Gen 3',
+    }));
+    expect(data.metrics.antutu.points.find((point) => point.phoneBrand === 'Samsung').details).toEqual(expect.objectContaining({
+      processorName: 'Snapdragon 8 Gen 3',
+    }));
+  });
+
+  it('keeps sibling variants in the exact generation and excludes adjacent generations', () => {
+    const csv = `${seriesFixture}\n`;
+    const data = buildBenchmarkGraphData(csv);
+    const samsungSeries = data.metrics.cpu.series.find((series) => series.id === 'Samsung:Galaxy S26');
+
+    expect(samsungSeries?.points.map((point) => point.phoneName)).toEqual([
+      'Samsung Galaxy S26',
+      'Samsung Galaxy S26+',
+      'Samsung Galaxy S26 Ultra',
+    ]);
+    expect(data.metrics.cpu.series.map((series) => series.points.flatMap((point) => point.phoneName))).not.toContainEqual(
+      expect.arrayContaining(['Samsung Galaxy S25', 'Samsung Galaxy S26']),
+    );
+  });
+
   it('connects only sibling variants within one phone generation', () => {
     const series = buildBenchmarkGraphData(seriesFixture).metrics.cpu.series;
 
