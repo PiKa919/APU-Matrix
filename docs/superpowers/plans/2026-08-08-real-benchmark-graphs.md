@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Source the graph data only from `public/data/phone-metrics-pricing.csv`, copied from `public/data/phone-metrics-pricing.csv` because the feature worktree predates the manually entered data.
+- Source the graph data only from `public/data/phone-metrics-pricing.csv` because the feature worktree predates the manually entered data.
 - CPU x-axis is Geekbench 6 multi-core; AI x-axis is Geekbench AI quantized score; AnTuTu x-axis is `x_metric_antutu_score`; y-axis is `y_price_inr` in INR.
 - Dots are colour-coded by `phone_brand` and a line may join only records with equal non-empty `phone_brand` and `device_family`.
 - Sort joined series by release year then numeric phone generation; do not infer series from `processor_series`.

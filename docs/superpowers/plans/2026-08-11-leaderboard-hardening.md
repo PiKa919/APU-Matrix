@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Work only in `the codex/apu-matrix-leaderboard worktree` on `codex/apu-matrix-leaderboard`; do not modify `the main working tree`.
+- Work only in the `codex/apu-matrix-leaderboard` worktree branch; do not modify the main working tree.
 - Preserve all pre-existing dirty files and unrelated user changes. Do not reset, restore, or rewrite history.
 - Use Bun for all package and script commands. Never use npm, npx, Yarn, or pnpm.
 - Do not fabricate benchmark scores, prices, GPU data, sources, or editorial content.

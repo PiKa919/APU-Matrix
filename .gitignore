@@ -39,3 +39,23 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local benchmark exports stay out of the public source repository.
+/public/data/*.csv
+/public/data/*.json
+
+# Scrapers (published separately)
+/scrappers/
+
+# Python caches
+__pycache__/
+
+# Local preview artifacts
+/.preview/
+
+# Raw scraped HTML files
+*.html
+!/app/**/*.html
+
+# Agent working files
+/.superpowers/
